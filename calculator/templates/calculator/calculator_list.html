@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block title %}Calculators{% endblock title %}
+{% block body %}
+
+<div class="flex flex-wrap justify-center gap-6 mt-40 px-4">
+    {% for url, label, image in urls %}
+        <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">
+            <!-- Background Image (Dynamically Set) -->
+            <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
+                 style="background-image: url('{% static 'images/' %}{{ image }}');">
+                <!-- Dark Overlay -->
+                <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
+            </div>
+
+            <!-- Text on Top -->
+            <div class="relative z-10 flex items-center justify-center h-full font-semibold text-center">
+                {{ label }}
+            </div>
+        </a>
+    {% endfor %}
+</div>
+{% endblock body %}

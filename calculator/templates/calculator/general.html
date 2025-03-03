@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}calculate{% endblock title %}
+<script src="https://cdn.tailwindcss.com"></script>
+{% block body %}
+<center>
+<form method="post">
+    {% csrf_token %}
+    {% if address == 'kokeb_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Astrology Sign Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
+        {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        <button type="submit" name="action" value="calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if user %}
+            <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+            <p class="text-midnightblue-500">የእርስዎ ኮከብ  "<font color="green">{{ user.sign }}</font>" ነው::</p>
+            <br>
+            <button formnovalidate class="bg-blue-900 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg" type="submit" name='action' value="knowsign">ስለ ኮከብዎ ለማወቅ</button>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'wealth_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Wealth Luck Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
+        {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        <button type="submit" name="action" value="wealth_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'behavior_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Behavior Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <button type="submit" name="action" value="behavior_calculate" class="relative border-green-800 rounded-lg  mt-10 h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'marriage_luck' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Luck Calculator</h1>
+            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+        {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
+        {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        <button type="submit" name="action" value="marriage_luck_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+            <p class="text-midnightblue-500">{{ result }}</p>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'place_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Place Luck Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.your_spouse_name.id_for_label }}" class="my-label-class">{{ form.your_spouse_name.label }}</label>
+        {{ form.your_spouse_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        <label for="{{ form.place_name.id_for_label }}" class="my-label-class">{{ form.place_name.label }}</label>
+        {{ form.place_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        
+        <button type="submit" name="action" value="place_luck_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'servant_behavior' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Servant Behavior Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.servant_name.id_for_label }}" class="my-label-class">{{ form.servant_name.label }}</label>
+        {{ form.servant_name|add_class:"mt-4 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <br>
+        <button type="submit" name="action" value="servant_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+        <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'legal_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Legal Case Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.judje_name.id_for_label }}" class="my-label-class">{{ form.judge_name.label }}</label>
+        {{ form.judge_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        <label for="{{ form.opponent_name.id_for_label }}" class="my-label-class">{{ form.opponent_name.label }}</label>
+        {{ form.opponent_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        
+        <button type="submit" name="action" value="legal_case_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'marriage_length' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Length Calculator</h1>
+            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+        {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
+        {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+    <br>
+        <button type="submit" name="action" value="marriage_time_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'life_luck_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Life Luck Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
+        {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+    <br>
+        <button type="submit" name="action" value="life_luck_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'enemy_behavior_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Enemy Behavior Calculator</h1>
+            <label for="{{ form.enemy_name.id_for_label }}" class="my-label-class">{{ form.enemy_name.label }}</label>
+        {{ form.enemy_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <br>
+        <button type="submit" name="action" value="enemy_behavior_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'born_prophecy_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Child Birth Calculator</h1>
+            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+        {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
+        {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        <label for="{{ form.pregnancy_month.id_for_label }}" class="my-label-class">{{ form.pregnancy_month.label }}</label>
+        {{ form.pregnancy_month|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        
+        <button type="submit" name="action" value="born_prophecy_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'pregnancy_prophecy_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Pregnancy Prophecy Calculator</h1>
+            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+        {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
+        {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+    <br>
+        <button type="submit" name="action" value="pregnancy_prophecy_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'patient_prophecy_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Patient Prophecy Calculator</h1>
+            <label for="{{ form.patient_name.id_for_label }}" class="my-label-class">{{ form.patient_name.label }}</label>
+        {{ form.patient_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.patient_mother_name.id_for_label }}" class="my-label-class">{{ form.patient_mother_name.label }}</label>
+        {{ form.patient_mother_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        <label for="{{ form.year.id_for_label }}" class="my-label-class">{{ form.year.label }}</label>
+        {{ form.year|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        
+        <label for="{{ form.month.id_for_label }}" class="my-label-class">{{ form.month.label }}</label>
+        {{ form.month|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        
+        <button type="submit" name="action" value="patient_prophecy_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+        <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'love_prophecy_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Love Prophecy Calculator</h1>
+            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+        {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
+        {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+    <br>
+        <button type="submit" name="action" value="love_prophecy_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% elif address == 'military_prophecy_calculator' %}
+        <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
+            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">War Prophecy Calculator</h1>
+            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
+        <label for="{{ form.day.id_for_label }}" class="my-label-class">{{ form.day.label }}</label>
+        {{ form.day|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
+        <label for="{{ form.war_month.id_for_label }}" class="my-label-class">{{ form.war_month.label }}</label>
+        {{ form.war_month|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
+        
+        <button type="submit" name="action" value="military_prophecy_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+    <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+        {% if result %}
+            <p class="text-midnightblue-500">{{ result }}</p>
+            <br>
+            {% else %}
+            <p>result will show here.
+        {% endif %}
+            </p>
+    </div></form></div>
+    {% else %}
+        {{ form.place_name }}
+    {% endif %}
+</form>
+</center>
+{% endblock body %}

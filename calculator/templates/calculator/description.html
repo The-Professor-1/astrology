@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+{% block title %}
+    <title>description</title>
+    {% endblock title %}
+</head>
+{% block body %}
+<body class="bg-gray-300">
+    <div id="container" class="bg-white w-[70%] lg:w-1/2 border-1 border-gray-400 rounded-lg shadow-lg p-4 mt-20 ml-[10%] lg:ml-72"><center>
+        <div id="title" class="bg-gray-200 rounded-lg shadow-lg p-2 font-sans text-2xl text-blue-900">
+            <center>
+                {{sign}}
+            </center>
+        </div>
+        <br><br><br>
+        <div class="bg-gray-200 shadow-lg p-2 text-lg text-blue-900 font-sans rounded-lg" id="description">
+            <center>
+        {{ description}}
+    </center>
+    </div></center>
+</div>
+</body>
+{% endblock body %}
+</body>
+</html>

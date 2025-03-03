@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% block title %}
+    <title>Dashboard</title>
+    {% endblock title %}
+</head>
+{% block body %}
+<body class="bg-gray-100 text-gray-900">
+    <form method="post">
+    <div class="max-w-6xl mx-auto p-6">
+        <div class="bg-white shadow-lg flex pt-16 rounded-lg p-6 mb-6">
+            <p class="text-2xl ml-[70%] font-semibold">Welcome, <font color='green'>{{ request.user.username}}</font>!</p>
+            <form action="{% url 'logout' %}" method="post" class="mt-4">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-600 text-white px-4 -mt-16 ml-6  rounded hover:bg-red-700">Logout</button>
+            </form>
+        </div>
+        <div class="text-3xl font-bold mb-4">Messages</div>
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            {% if messages %}
+                <table class="w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border border-gray-300 p-3 text-left">Name</th>
+                            <th class="border border-gray-300 p-3 text-left">Email</th>
+                            <th class="border border-gray-300 p-3 text-left">Message</th>
+                            <th class="border border-gray-300 p-3 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in messages %}
+                            <tr class="border border-gray-300">
+                                <td class="border border-gray-300 p-3">{{ i.name }}</td>
+                                <td class="border border-gray-300 p-3">{{ i.email }}</td>
+                                <td class="border border-gray-300 p-3">{{ i.message }}</td>
+                                <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                                    <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Reply</button>
+                                    <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-gray-500">You have no messages.</p>
+            {% endif %}
+        </div>
+    <br>
+    <div class="text-3xl font-bold mb-4">Users</div>
+<div class="bg-white shadow-lg rounded-lg p-6">
+    {% if users %}
+        <table class="w-full border-collapse border border-gray-300">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 p-3 text-left">Name</th>
+                    <th class="border border-gray-300 p-3 text-left">Mother Name</th>
+                    <th class="border border-gray-300 p-3 text-left">Sign</th>
+                    <th class="border border-gray-300 p-3 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in users %}
+                    <tr class="border border-gray-300 {% if forloop.counter > 5 %}hidden{% endif %}">
+                        <td class="border border-gray-300 p-3">{{ i.selfname }}</td>
+                        <td class="border border-gray-300 p-3">{{ i.mothersname }}</td>
+                        <td class="border border-gray-300 p-3">{{ i.sign }}</td>
+                        <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                            <button name="dashboard-user-delete" value="{{ i.id }}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if users|length > 5 %}
+            <div class="flex justify-end mt-4">
+                <button id="showMoreBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Show More</button>
+            </div>
+        {% endif %}
+    {% else %}
+        <p class="text-gray-500">You have no users.</p>
+    {% endif %}
+</div>
+</form>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const showMoreBtn = document.getElementById("showMoreBtn");
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener("click", function () {
+                document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
+                showMoreBtn.style.display = "none"; // Hide button after showing all rows
+            });
+        }
+    });
+</script>
+</body>
+{% endblock body %}
+</html>

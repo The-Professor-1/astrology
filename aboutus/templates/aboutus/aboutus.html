@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}About Us{% endblock title %}
+{% block body %}
+
+<div class="flex flex-wrap ml-20 mt-20 items-center gap-8 p-10">
+    <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-bold">sinekewkibt.com</h2>
+        <p class="mt-4">sinekewkibt.com is astrology based website which delivers ancient ethiopians astrology calculation
+            art and algorithm, which is very different from western world astrology calculation technique. additionally this
+            site provides many more features which can calculate and tell about your future and luck.
+        </p>
+    </div>
+    </div>
+    <div class="mt-20">
+        <div class="text-2xl font-bold ml-20 mb-4">FAQ</div>
+        <ul class="space-y-2 w-full lg:w-1/2  ml-40">
+            {% for i,j in faqs%}
+                <li>
+                    <button class="faq-button bg-gray-200 p-3 w-full text-left rounded hover:bg-gray-600 hover:text-white" onclick="toggleFAQ('faq{{ i }}')">{{ i }}</button>
+                    <div id="faq{{ i }}" class="hidden bg-white p-4 ml-10 mt-2 rounded">{{j}}.</div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <!-- Text and Image Section -->
+    <div class="flex flex-wrap justify-center items-center gap-8 p-10">
+        <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
+            <h2 class="text-2xl font-bold">ስነ-ከዋክብት ምንድን ነው?</h2>
+            <p class="mt-4">ስነ-ከዋክብት ወይም አስትሮሎጂ የፕላኔቶችና የከዋክብትን አቀማመጥ መሰረት ያደረገ: በተለያዩ ወቅቶች የሚወጡ ከዋክብትን በማገጣጠምና 
+              የባህሪ ምሳሌ በመፍጠር የሰዎችን ባህሪ: የህይወት እጣ ፈንታ እንዲሁም ለትዳር:ለኑሮ እና ለስራ የሚስማማቸውን እና የማይስማማቸውን : በተጨማሪም ለተለያዩ የህይወት አጋጣሚዎች ለምሳሌ ሞት በሽታ ሁሉ 
+           ቅድመ ዝግጅት እንድናድርግና ቢገጥሙን ድግሞ እንዴት መወጣት እንደምንችል በዝርዝር የሚያስረዳ ጥበብ ነው:: ይህ ጥበብ ከሀገር ሀገር የሚለያይ ሲሆን
+           ዋናው የሚለይበት ነገር የሰዎችን ኮከብ ለማስላት የሚጠቀሙበት ግብአት ነው:: ለምሳሌ በምእራባውያኑ አለም ኮከብን ለማስላት የሚጠቀሙት ግብአት የትውልድ ወርና ቀንን ሲሆን
+           በኢትዮጽያ ደግሞ የምንጠቀመው ኮከብ የሚሰራለትን ሰው እና የእናቱን መጠሪያ ስም ነው:: ስምን መልአከ ያወጣዋል እንዲሉ አበው በትክክል የሰዎችን ባህሪ የሚገልፀውም በዚሁ
+           በኢትዮጵያውያን ሊቃውንት የተዘጋጀው ቀመር ነው:: በዚህ ድህረ ገፅ የተቀመጠውም ይሄው የስሌት ቀመር ነው::</p>
+        </div>
+        <div class="w-full lg:w-1/3">
+          <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
+        </div>
+        <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
+          <h2 class="text-2xl font-bold">የከዋክብት ጥናት ስለ ሀብት፣ፍቅርና ትዳር እንዲሁም አኗኗር ምን ይላል?</h2>
+          <p class="mt-4">እንደ ስነ-ከዋክብት ጥናት ለእያንዳንዱ ኮከብ በግብር የሚገጥሙ የባሕሪ ወገን የሆኑ ኮከቦች አሉት።
+            ከእነዚህ የባሕሪ ወገኖቹ ውስጥ ደግሞ ከሌሎች ኮከቦች ይበልጥ ቤተ-ክፍሉ
+         የሆነ በባሕሪ የሚገጥም አንድ ኮከብ አለ። ይህ ኮከብም ለፍቅር ወይም ለትዳር ተመራጭ 
+          የሚሆነው ኮከብ ነው።
+            ከዚህ በተጨማሪም ጥንታዊ ኢትዮጵያውያን እንደ ሐሳበ-ሀብት እና መፍትሄ-ሀብት 
+          በመሳሰሉት ጥበብ በተሞላበት ምርምራቸው ስለ ሀብት ጥናት አስቀምጠዋል። እነዚህንና ሌሎችም ስሌቶችን 
+         ራስጌ ላይ ባለው ስሌት ወይም calculate ባሚለው ገፅ ውስጥ በመግባት ማስላት ይቻላል:: ቀመሩ
+          የተዘጋጀ ስለሆነ ከእርስዎ የሚጠበቀው የሚያስፈልጉትን መረጃዎች ብቻ በተዘጋጁ ሳጥኖች ውስጥ መሙላት ነው::</p>
+      </div>
+      <div class="w-full lg:w-1/3">
+        <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
+      </div>
+      <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-bold">ማሳሰቢያ፡</h2>
+        <p class="mt-4">በዚህ ድህረ ገጽ የተቀመጠው የምርምር ውጤት ትክክለኝነት በማስረጃ ያልተረጋገጠ ሲሆን፤ የድህረ ገጹ ዋና አላማም ጥናቱን 
+          ለመረጃ ያክል ለአንባቢያን ማድረስ ብቻ ነው፡፡ በዚህ ድህረ ገጽ ላይ በተቀመጠው መረጃ መሰረት ለሚደርሰው ማንኛውም ድርጊትና ውጤት ድርጅቱ
+          ሃላፊነቱን አይወስድም፡፡
+        </p>
+    </div>
+    <div class="w-full lg:w-1/3">
+      <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
+    </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const showMoreBtn = document.getElementById("showMoreBtn");
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener("click", function () {
+                    document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
+                    showMoreBtn.style.display = "none"; // Hide button after showing all rows
+                });
+            }
+        });
+        
+        function toggleFAQ(id) {
+            const faq = document.getElementById(id);
+            if (faq) {
+                faq.classList.toggle("hidden");
+            }
+        }
+    </script>
+{% endblock body %}
