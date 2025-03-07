@@ -171,8 +171,8 @@ def calculators_list(request):
     ('military_prophecy', 'ወደ ጦርነት ለሄደ ወይም ለሚሄድ','home-big-image.png'),
     ('servant_behavior','ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ','home-big-image.png'),
         ]
-   return render(request, 'calculator/calculator_list.html', {'urls': urls})
-
+   admin = request.session.get('admin', 0)
+   return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin})
 # Placeholder views
 def servant_behavior(request):
     form = GeneralForm()

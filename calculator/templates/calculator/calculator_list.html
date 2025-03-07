@@ -4,21 +4,132 @@
 {% block title %}Calculators{% endblock title %}
 {% block body %}
 
-<div class="flex flex-wrap justify-center gap-6 mt-40 px-4">
+<!-- Include Font Awesome for Lock Icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<center>
+<ul class="space-y-2 w-full lg:w-1/2 mt-24">
+        <li>
+            <button class="bg-blue-600 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg hover:bg-blue-900 hover:scale-105 hover:text-white" onclick="toggleFAQ('1')">ሁሉንም አገልግሎቶች ለማግኘት</button>
+            <div id="1" class="hidden bg-white p-4 ml-10 mt-2 rounded">
+            በዚህ ገጽ ላይ ያሉትን የሀብት፣የትዳር፣የፍቅር፣የባህረ እንዲሁም ሌሎች ስሌቶችን የአገልግሎት ክፍያ በመክፈል ማስላት የሚችሉ ሲሆን ክፍያውን የሚፈጽሙት በቴሌብር መተግበሪያ ነው፡፡
+             ክፍያውን ከዚህ በታች ባለው መረጃ መሰረት መፈፀም ይችላሉ፡፡
+             <BR><div class="text-md text-gray-700"><i>የቴሌብር አካውንት ስም ፡ ንጉስ (negus)<BR> የቴሌብር አካውንት ስልክ ፡ 0952838412<BR>የክፍያው መጠን ፡ 199ብር</i></div><BR>
+             ክፍያውን ከፈፀሙ በሁዋላ ከታች ባለው ሳጥን በዚህ ድህረ-ገጽ አካውንት የከፉቱበትን ስም እና የክፍያውን ቁጥር(transaction number) ይላኩልን፡፡ ክፍያውን ካረጋገጥን በሁዋላ አገልግሎቱን የሚያገኙበትን ፈቃድ እንሰጥዎታለን፡፡<br>
+            የክፍያው ሂደት ከታች በፎቶ ተቀምጧል፡፡<br>
+        <form method="post">
+            {% csrf_token %}
+            <input class="border rounded border-black w-1/2" type="text" name="username" placeholder="የአካውንት ስም..."><BR>
+                <input class="border rounded border-black mt-2 w-1/2" type="text" name="transaction_number" placeholder="የክፍያ ቁጥር..."><BR>
+                    <button class="bg-blue-500 mt-4 w-20 p-1 rounded text-white" type="submit" name="action" value="nameandnumber">send</button>
+        </form></div>
+        </li>
+</ul>
+</center>
+<div class="flex flex-wrap justify-center gap-6 mt-20 px-4">
     {% for url, label, image in urls %}
-        <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">
-            <!-- Background Image (Dynamically Set) -->
-            <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
-                 style="background-image: url('{% static 'images/' %}{{ image }}');">
-                <!-- Dark Overlay -->
-                <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
+        {% if forloop.first or admin == 1 %}
+            <!-- Accessible Item (First item or Admin) -->
+            <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">
+                <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
+                     style="background-image: url('{% static 'images/' %}{{ image }}');">
+                    <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
+                </div>
+                <div class="relative z-10 text-lg lg:text-2xl flex items-center justify-center h-full font-semibold text-center">
+                    {{ label }}
+                </div>
+            </a>
+        {% else %}
+            <!-- Locked Item with Popup -->
+            <div class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200 cursor-pointer locked-item" data-label="{{ label }}">
+                <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
+                     style="background-image: url('{% static 'images/' %}{{ image }}');">
+                    <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
+                </div>
+                <!-- Lock Icon -->
+                <i class="fas fa-lock absolute top-2 right-2 text-white text-xl z-20"></i>
+                <div class="relative z-10 text-lg lg:text-2xl flex items-center justify-center h-full font-semibold text-center">
+                    {{ label }}
+                </div>
             </div>
-
-            <!-- Text on Top -->
-            <div class="relative z-10 flex items-center justify-center h-full font-semibold text-center">
-                {{ label }}
-            </div>
-        </a>
+        {% endif %}
     {% endfor %}
 </div>
+
+<!-- Popup Modal -->
+<div id="popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h3 id="popup-title" class="text-xl font-bold mb-2"></h3>
+        <p id="popup-definition" class="text-gray-700"></p>
+        <button id="close-popup" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Close</button>
+    </div>
+</div>
+
+<!-- JavaScript for Popup -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const lockedItems = document.querySelectorAll('.locked-item');
+    const popupModal = document.getElementById('popup-modal');
+    const popupTitle = document.getElementById('popup-title');
+    const popupDefinition = document.getElementById('popup-definition');
+    const closePopup = document.getElementById('close-popup');
+
+    // Definitions for each locked item (customize as needed)
+    const definitions = {
+        'የሃብት እጣ ፈንታን ለማወቅ': 'በዚህ ስሌት የእርስዎን የሃብት እድል መጨረሻ ማወቅ ይችላሉ።',
+        'ስለ ጠባይ ለማወቅ': 'በዚህ ስሌት የእርስዎ ጸባይ ምን አይነት እንደሆነ ማወቅ ይችላሉ።',
+        'ስለ መኖሪያ ቦታ ምቹነት': 'በዚህ ስሌት ለመኖር ያሰቡበት ቦታ ለእርስዎ የሚስማማ እንደሆነ ማወቅ ይችላሉ።',
+        'ስለ ትዳር በረከት ለማወቅ': 'በዚህ ስሌት በትዳር ውስጥ ማን በረከት እንዳለው ማወቅ ይችላሉ።',
+        'ሰለሚወለድ ልጅ ለማዎቅ': 'በዚህ ስሌት ምን አይነት ልጅ ሊወለድ እንደሚችል መተንበይ ይችላሉ።',
+        'ለተፀነሰ ትንቢት': 'በዚህ ስሌት የፅንሱን እጣ ፋንታ ማወቅ ይችላሉ።',
+        'ስለ ፍቅር ትንቢት': 'በዚህ ስሌት የሁለት ሰዎች ፍቅር ጥሩ መሆን አለመሆኑን ማወቅ ይችላሉ።',
+        'ስለ በሽተኛ ሁኔታ ለማወቅ': 'በዚህ ስሌት የአንድን በሽተኛ መጨረሻ መተንበይ ይችላሉ።',
+        'ስለ ፍርድ ውሳኔ ለማወቅ': 'በዚህ ስሌት የሚገጥምዎትን የፍርድ ውሳኔ መተንበይ ይችላሉ።',
+        'ስለ ትዳር ቆይታ ለማወቅ': 'በዚህ ስሌት ስልሚያሳልፉት የትዳር ህይወት እና ማን በሞት እንደሚቀድም መተንበይ ይችላሉ።',
+        'ስለ ጠላት ፀባይ ለማወቅ': 'በዚህ ስሌት ጠላትዎ ምን አይነት ባህሪ እንዳለው ማወቅ ይችላሉ።',
+        'ስለራስ ኑሮ እድል ለማወቅ': 'በዚህ ስሌት የእርስዎ እድል በምን እንዳለ ማወቅ ይችላሉ።',
+        'ወደ ጦርነት ለሄደ ወይም ለሚሄድ': 'በዚህ ስሌት በጦርነት ያለ ምን እንደሚገጥመው መተንበይ ይችላሉ።',
+        'ስለ ሰራተኛ ጸባይ ለማወቅ': 'በዚህ ስሌት ለእርስዎ ስለሚሰራ ሰው ጸባይ ማወቅ ይችላሉ።',
+    };
+
+    lockedItems.forEach(item => {
+        item.addEventListener('click', function () {
+            const label = this.getAttribute('data-label');
+            popupTitle.textContent = label;
+            popupDefinition.textContent = definitions[label] || 'ይህ መሣሪያ ገና መግለጫ የለውም።';
+            popupModal.classList.remove('hidden');
+        });
+    });
+
+    
+
+    closePopup.addEventListener('click', function () {
+        popupModal.classList.add('hidden');
+    });
+
+    // Close popup when clicking outside
+    popupModal.addEventListener('click', function (e) {
+        if (e.target === popupModal) {
+            popupModal.classList.add('hidden');
+        }
+    });
+});
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const showMoreBtn = document.getElementById("showMoreBtn");
+        if (showMoreBtn) {
+            showMoreBtn.addEventListener("click", function () {
+                document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
+                showMoreBtn.style.display = "none"; // Hide button after showing all rows
+            });
+        }
+    });
+    
+    function toggleFAQ(id) {
+        const faq = document.getElementById(id);
+        if (faq) {
+            faq.classList.toggle("hidden");
+        }
+    }
+</script>
 {% endblock body %}
