@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, like_post, add_comment, add_reply, user_register, user_login, user_logout,delete_comment ,delete_reply
+from .views import home, like_post,delete_post, add_comment, add_reply, user_register, user_login, user_logout,delete_comment ,delete_reply
 
 
 urlpatterns = [
@@ -12,4 +12,5 @@ urlpatterns = [
     path("reply/<int:comment_id>/", add_reply, name="add_reply"),
     path('delete_comment/<int:comment_id>/', delete_comment, name='delete_comment'),
     path('delete_reply/<int:reply_id>/', delete_reply, name='delete_reply'),
+    path('delete_post/<int:post_id>/', delete_post, name='delete_post'),
 ]

@@ -140,7 +140,19 @@ def delete_comment(request, comment_id):
     if request.user == comment.user or request.session.get('admin', 0) == 1:
         comment.delete()
     return redirect('home')
-
+@login_required
+def delete_post(request, post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id)
+        
+        # Check if the user is an admin or the post creator
+        if request.user == post.user or request.session.get('admin', 0) == 1:
+            post.delete()
+            messages.success(request, 'Post deleted successfully.')
+        else:
+            messages.error(request, 'You do not have permission to delete this post.')
+    
+    return redirect('home')  # Redirect to the home page or wherever appropriate
 @login_required
 def delete_reply(request, reply_id):
     reply = Reply.objects.get(id=reply_id)

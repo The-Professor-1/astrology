@@ -40,10 +40,10 @@
     {% if admin == 1 %}
         <form method="POST" enctype="multipart/form-data" class="bg-white lg:w-1/2 shadow-md p-4 rounded-lg mb-4">
             {% csrf_token %}
-            <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..."></textarea>
+            <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..." style="white-space: pre-line;"></textarea>
             <input type="file" name="images" accept="image/*" multiple class="hidden" id="file-input">
             <label for="file-input" class="cursor-pointer mt-2 inline-block">
-                <img src="{% static 'images/upload-icon.png' %}" alt="Upload" class="w-6 h-6">
+                <img src="{% static 'images/imageicon.png' %}" alt="Upload" class="w-6 h-6">
             </label>
             <button type="submit" name='action' value='post_button' class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Post</button>
         </form>
@@ -54,24 +54,32 @@
     <div class="max-w-2xl mx-auto mt-6">
         {% for post in posts %}
         <div class="bg-white shadow-md p-4 rounded-lg mb-4">
-            <p>{{ post.text }}</p>
+            <p style="white-space: pre-line;">{{ post.text }}</p>
             {% for image in post.images.all %}
                 <img src="{{ image.image.url }}" class="mt-2 w-full h-64 object-cover">
             {% endfor %}
+            <!-- Delete Button (Visible only to admin or post creator) -->
+            {% if admin == 1 or request.user == post.user %}
+            <form method="POST" action="{% url 'delete_post' post.id %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="text-red-500 hover:text-red-700">Delete Post</button>
+            </form>
+            {% endif %}
             <div class="mt-2 flex justify-between">
                 <!-- Like Button with Facebook Icon -->
                 <button class="like-btn text-gray-500 hover:text-blue-600" data-post-id="{{ post.id }}">
-                    <i class="far fa-thumbs-up text-xl"></i> 
-                    (<span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>)
+                    Likes (<span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>)
                 </button>
                 <!-- Comment Trigger -->
-                <span class="text-gray-500 cursor-pointer comment-toggle" data-post-id="{{ post.id }}">Comment</span>
+                <span class="text-gray-500 cursor-pointer comment-toggle" data-post-id="{{ post.id }}">
+                    Comment (<span id="comment-count-{{ post.id }}">{{ post.comments.count }}</span>)
+                </span>
             </div>
 
             <!-- Comments Section -->
-            <div id="comments-section-{{ post.id }}" class="mt-4">
+            <div id="comments-section-{{ post.id }}" class="mt-4 hidden">
                 <!-- Comment Form (Hidden Initially) -->
-                <form class="comment-form hidden" data-post-id="{{ post.id }}">
+                <form class="comment-form" data-post-id="{{ post.id }}">
                     {% csrf_token %}
                     <input type="text" name="text" placeholder="Add a comment..." class="border p-1 w-3/4">
                     <button type="submit" class="bg-green-500 text-white px-2 py-1">Comment</button>
@@ -138,7 +146,7 @@
         // Toggle Comment Form
         $(".comment-toggle").click(function () {
             let post_id = $(this).data("post-id");
-            $(`.comment-form[data-post-id="${post_id}"]`).toggleClass("hidden");
+            $(`#comments-section-${post_id}`).toggleClass("hidden");
         });
 
         // Toggle Reply Form
@@ -162,24 +170,30 @@
                     csrfmiddlewaretoken: csrf_token
                 },
                 success: function (response) {
-                    let commentHtml = `
-                        <div class="p-2 border rounded my-2">
-                            <strong>${response.user}</strong>: ${response.text}
-                            <small class="text-gray-500">${response.created_at}</small>
-                            <div class="ml-4 mt-2">
-                                <span class="text-gray-500 cursor-pointer reply-toggle" data-comment-id="${response.id}">Reply</span>
-                                <form class="reply-form hidden" data-comment-id="${response.id}">
-                                    <input type="text" name="text" placeholder="Reply..." class="border p-1 w-3/4">
-                                    <button type="submit" class="bg-blue-500 text-white px-2 py-1">Reply</button>
-                                </form>
-                                <div id="replies-${response.id}"></div>
-                            </div>
-                        </div>
-                    `;
-                    $(`#comments-section-${post_id}`).append(commentHtml);
-                    $(`.comment-form[data-post-id="${post_id}"] input[name='text']`).val("");
-                    $(`.comment-form[data-post-id="${post_id}"]`).addClass("hidden");
-                }
+    let commentHtml = `
+        <div class="p-2 border rounded my-2">
+            <strong>${response.user}</strong>: ${response.text}
+            <small class="text-gray-500">${response.created_at}</small>
+            <div class="ml-4 mt-2">
+                <span class="text-gray-500 cursor-pointer reply-toggle" data-comment-id="${response.id}">Reply</span>
+                <form class="reply-form hidden" data-comment-id="${response.id}">
+                    <input type="text" name="text" placeholder="Reply..." class="border p-1 w-3/4">
+                    <button type="submit" class="bg-blue-500 text-white px-2 py-1">Reply</button>
+                </form>
+                <div id="replies-${response.id}"></div>
+            </div>
+        </div>
+    `;
+    $(`#comments-section-${post_id}`).append(commentHtml);
+
+    // Update the comment count
+    let commentCount = parseInt($(`#comment-count-${post_id}`).text());
+    $(`#comment-count-${post_id}`).text(commentCount + 1);
+
+    // Clear the input field and hide the form
+    $(`.comment-form[data-post-id="${post_id}"] input[name='text']`).val("");
+    $(`#comments-section-${post_id}`).removeClass("hidden");
+}
             });
         });
 
@@ -212,27 +226,26 @@
         });
 
         // Like Button Toggle
-        $(".like-btn").click(function () {
-            let post_id = $(this).data("post-id");
-            let $icon = $(this).find("i");
-            let $count = $(`#like-count-${post_id}`);
+        
+$(".like-btn").click(function () {
+    let post_id = $(this).data("post-id");
+    let $likeCount = $(`#like-count-${post_id}`);
 
-            $.ajax({
-                type: "POST",
-                url: `/like/${post_id}/`,
-                data: {
-                    csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
-                },
-                success: function (response) {
-                    if (response.liked) {
-                        $icon.removeClass("far").addClass("fas").css("color", "#3b5998"); // Filled blue
-                    } else {
-                        $icon.removeClass("fas").addClass("far").css("color", ""); // Clear white
-                    }
-                    $count.text(response.count);
-                }
-            });
-        });
+    $.ajax({
+        type: "POST",
+        url: `/like/${post_id}/`,
+        data: {
+            csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
+        },
+        success: function (response) {
+            // Update the like count dynamically
+            $likeCount.text(response.count);
+        },
+        error: function (xhr, status, error) {
+            console.error("Error liking the post:", error);
+        }
+    });
+});
 
         // Edit Comment (Placeholder - Implement server-side logic)
         $(".edit-comment").click(function () {
