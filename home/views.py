@@ -10,7 +10,7 @@ from django.contrib import messages
 
 def home(request):
     posts = Post.objects.prefetch_related("images", "likes", "comments__replies").order_by("-created_at")
-
+    admin = request.session.get('admin', 0)
     if request.method == "POST":
         if not request.user.is_authenticated:
             return redirect("login")
@@ -33,7 +33,7 @@ def home(request):
         form = PostForm()
     
     comment_form = CommentForm()
-    return render(request, "home/home.html", {"form": form, "posts": posts, "comment_form": comment_form})
+    return render(request, "home/home.html", {"form": form, "posts": posts, "comment_form": comment_form,'admin':admin})
 
 @login_required
 def like_post(request, post_id):
@@ -106,16 +106,21 @@ def user_register(request):
     return render(request, "home/register.html", {"form": form})
 
 def user_login(request):
+    
     if request.method == "POST":
         form = LoginForm(request.POST)
+        admin = 0
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
+            if username == 'professor':
+                admin = 1
             user = authenticate(request, username=username, password=password)
 
             if user:
                 login(request, user)
                 messages.success(request, f"Welcome, {user.username}!")
+                request.session['admin'] = admin
                 return redirect("home")  # Redirect to home page
             else:
                 messages.error(request, "Invalid username or password.")
@@ -129,3 +134,16 @@ def user_logout(request):
     logout(request)
     messages.success(request, "You have been logged out.")
     return redirect("login")
+@login_required
+def delete_comment(request, comment_id):
+    comment = Comment.objects.get(id=comment_id)
+    if request.user == comment.user or request.session.get('admin', 0) == 1:
+        comment.delete()
+    return redirect('home')
+
+@login_required
+def delete_reply(request, reply_id):
+    reply = Reply.objects.get(id=reply_id)
+    if request.user == reply.user or request.session.get('admin', 0) == 1:
+        reply.delete()
+    return redirect('home')
