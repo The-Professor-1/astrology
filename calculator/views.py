@@ -1,11 +1,11 @@
-from django.shortcuts import render # type:ignore
+from django.shortcuts import render,redirect # type:ignore
 from django.http import HttpResponse # type:ignore
 from django.contrib import messages # type:ignore
 from django.urls import reverse # type:ignore
 from calculator import library as lb
 from .forms import RegisterForm,GeneralForm
-from .models import Users
-
+from .models import Users,Message_After_Transaction
+from home.models import User
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -15,6 +15,20 @@ SERVANT_MODULUS = 5
 MARRIAGE_MODULUS = 8
 
 # Helper function to calculate sum
+def nameandnosender(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'send_nameandnumber':
+            name = request.POST.get('username')
+            number = request.POST.get('transaction_number')
+            
+            try:
+                item = Message_After_Transaction(username=name,Transaction_Number=number)
+                item.save()
+                return HttpResponse('<h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1>')
+            except Exception as e:
+                messages.error(request, f"An error occurred: {str(e)}")
 def calculate_sum(name, modulus, fidel_pairs):
     """
     Calculate the sum of character values from a name based on a fidel value pair dictionary.

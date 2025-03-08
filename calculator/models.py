@@ -6,3 +6,6 @@ class Users(models.Model):
     mothersname = models.CharField(max_length=100)
     sign = models.CharField(max_length=100)
     description = models.CharField(default='',max_length=10000)
+class Message_After_Transaction(models.Model):
+    username = models.CharField(max_length=100)
+    Transaction_Number = models.CharField(max_length=100)
