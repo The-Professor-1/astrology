@@ -21,8 +21,11 @@
       <div class="absolute inset-0 bg-black opacity-50"></div>
       <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
           <h1 class="lg:text-7xl text-4xl font-bold">ወፍካሬ-ከዋክብት</h1>
-          <p class="text-lg lg:text-4xl mt-2">የጥንታዊ ኢትዮጵያውያን ሊቃውንቶችና ጠበብቶች የምርምር ውጤት</p>
+          <p class="text-lg lg:text-4xl mt-2">የጥንታዊ ኢትዮጵያውያን ሊቃውንቶችና ጠበብቶች የምርምር ውጤት</p><br>
+          <a href="{% url 'calculator_list'%}"><button class="bg-blue-600 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg hover:bg-blue-900 hover:scale-105 hover:text-white">ኮከብዎን ለማስላት ይሄን ይጫኑ</button>
+          </a>
       </div>
+      
     </div>
 
     <!-- Four Rounded Squares -->
@@ -38,15 +41,23 @@
     <!-- Post Form (unchanged) -->
     <center>
     {% if admin == 1 %}
-        <form method="POST" enctype="multipart/form-data" class="bg-white lg:w-1/2 shadow-md p-4 rounded-lg mb-4">
-            {% csrf_token %}
-            <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..." style="white-space: pre-line;"></textarea>
-            <input type="file" name="images" accept="image/*" multiple class="hidden" id="file-input">
-            <label for="file-input" class="cursor-pointer mt-2 inline-block">
-                <img src="{% static 'images/imageicon.png' %}" alt="Upload" class="w-6 h-6">
-            </label>
-            <button type="submit" name='action' value='post_button' class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Post</button>
-        </form>
+    <form method="POST" enctype="multipart/form-data" class="bg-white lg:w-1/2 shadow-md p-4 rounded-lg mb-4">
+        {% csrf_token %}
+        <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..." style="white-space: pre-line;"></textarea>
+        
+        <!-- Hidden file input -->
+        <input type="file" name="images" accept="image/*" multiple class="hidden" id="file-input">
+        
+        <!-- Image upload trigger -->
+        <label for="file-input" class="cursor-pointer mt-2 inline-block">
+            <img src="{% static 'images/imageicon.png' %}" alt="Upload" class="w-6 h-6">
+        </label>
+        
+        <!-- Image preview container -->
+        <div id="image-preview" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
+        
+        <button type="submit" name="action" value="post_button" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Post</button>
+    </form>
     {% endif %}
     <br>
 
@@ -55,9 +66,15 @@
         {% for post in posts %}
         <div class="bg-white shadow-md p-4 rounded-lg mb-4">
             <p style="white-space: pre-line;">{{ post.text }}</p>
-            {% for image in post.images.all %}
-                <img src="{{ image.image.url }}" class="mt-2 w-full h-64 object-cover">
-            {% endfor %}
+            {% if post.images.all %}
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+                {% for image in post.images.all %}
+                    <div class="w-full h-32 lg:h-48 relative overflow-hidden rounded-lg">
+                        <img src="{{ image.image.url }}" class="w-full h-full object-cover" alt="Post Image">
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <!-- Delete Button (Visible only to admin or post creator) -->
             {% if admin == 1 or request.user == post.user %}
             <form method="POST" action="{% url 'delete_post' post.id %}" class="inline">
@@ -262,6 +279,39 @@ $(".like-btn").click(function () {
         });
     });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('file-input');
+            const imagePreview = document.getElementById('image-preview');
+        
+            fileInput.addEventListener('change', function () {
+                // Clear previous previews
+                imagePreview.innerHTML = '';
+        
+                // Loop through selected files
+                const files = this.files;
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const imgContainer = document.createElement('div');
+                            imgContainer.className = 'w-full h-32 lg:h-48 relative overflow-hidden rounded-lg';
+                            
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'w-full h-full object-cover'; // Fill container
+                            img.alt = 'Preview';
+        
+                            imgContainer.appendChild(img);
+                            imagePreview.appendChild(imgContainer);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                }
+            });
+        });
+        </script>
 {% endblock %}
 </body>
 </html>

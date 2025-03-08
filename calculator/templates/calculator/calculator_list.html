@@ -18,8 +18,8 @@
             የክፍያው ሂደት ከታች በፎቶ ተቀምጧል፡፡<br>
         <form method="post">
             {% csrf_token %}
-            <input class="border rounded border-black w-1/2" type="text" name="username" placeholder="የአካውንት ስም..."><BR>
-                <input class="border rounded border-black mt-2 w-1/2" type="text" name="transaction_number" placeholder="የክፍያ ቁጥር..."><BR>
+            <input class="border rounded p-1 border-black w-1/2" type="text" name="username" placeholder="የአካውንት ስም..."><BR>
+                <input class="border rounded p-1 border-black mt-2 w-1/2" type="text" name="transaction_number" placeholder="የክፍያ ቁጥር..."><BR>
                     <button class="bg-blue-500 mt-4 w-20 p-1 rounded text-white" type="submit" name="action" value="nameandnumber">send</button>
         </form></div>
         </li>

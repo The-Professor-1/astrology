@@ -34,7 +34,16 @@
     <header>
         <nav class="bg-white fixed top-0 left-0 shadow-lg z-50 text-gray-700 p-4 w-full">
             <div class="container mx-auto flex justify-between items-center">
-                <div class="text-2xl lg:text-4xl font-bold" id="logo">ስነ-ከዋክብት</div>
+                <a href="{% url 'home' %}"><div class="text-2xl lg:text-4xl font-bold" id="logo">ስነ-ከዋክብት</div></a>
+                <div id="loginandregisterbuttons">
+                    {% if user.is_authenticated %}
+                        <span class="mr-4">Hello, {{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="text-white bg-red-500 px-4 py-2 rounded">Logout</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-white bg-green-500 px-4 py-2 rounded">Login</a>
+                        <a href="{% url 'register' %}" class="text-white bg-blue-500 px-4 py-2 rounded">Register</a>
+                    {% endif %}
+                </div>
                 <button id="menu-button" class="lg:hidden focus:outline-none">
                     <div class="space-y-1">
                         <span class="block w-6 h-1 bg-gray-700"></span>
@@ -48,15 +57,7 @@
                     <li><a href="{% url 'contact' %}" class="nav-link" id="nav-contact">Contact Us</a></li>
                     <li><a href="{% url 'aboutus' %}" class="nav-link" id="nav-dashboard">About Us</a></li>
                 </ul>
-                <div>
-                    {% if user.is_authenticated %}
-                        <span class="mr-4">Hello, {{ user.username }}</span>
-                        <a href="{% url 'logout' %}" class="text-white bg-red-500 px-4 py-2 rounded">Logout</a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="text-white bg-green-500 px-4 py-2 rounded">Login</a>
-                        <a href="{% url 'register' %}" class="text-white bg-blue-500 px-4 py-2 rounded">Register</a>
-                    {% endif %}
-                </div>
+               
             </div>
         </nav>
     </header>
@@ -70,6 +71,7 @@
     <script>
         document.getElementById('menu-button').addEventListener('click', function() {
             document.getElementById('menus').classList.toggle('hidden');
+            document.getElementById('loginandregisterbuttons').classList.toggle('hidden');
         });
 
         // Highlight active link
