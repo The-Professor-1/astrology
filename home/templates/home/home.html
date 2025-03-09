@@ -65,12 +65,15 @@
     <div class="w-[90%] lg:w-1/2 mx-auto mt-6">
         {% for post in posts %}
         <div class="bg-white shadow-md p-4 rounded-lg mb-4">
+            <div class="border rounded-[50%] -ml-[80%] w-10 h-10 border-black">
+                <img class="rounded-[50%] w-full" src="{% static 'images/myphoto.jpg' %}">
+            </div><div class="text-md text-gray-500 -ml-[45%] -mt-10">Professor</div><br><br>
             <p style="white-space: pre-line;">{{ post.text }}</p>
             {% if post.images.all %}
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
                 {% for image in post.images.all %}
                     <div class="w-full h-32 lg:h-48 relative overflow-hidden rounded-lg">
-                        <img src="{{ image.image.url }}" class="w-full h-full object-cover" alt="Post Image">
+                        <img  src="{{ image.image.url }}" class="w-full h-full object-cover" alt="Post Image">
                     </div>
                 {% endfor %}
             </div>
