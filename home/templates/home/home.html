@@ -67,7 +67,9 @@
         <div class="bg-white shadow-md p-4 rounded-lg mb-4">
             <div class="border rounded-[50%] -ml-[80%] w-10 h-10 border-black">
                 <img class="rounded-[50%] w-full" src="{% static 'images/myphoto.jpg' %}">
-            </div><div class="text-md text-gray-500 -ml-[45%] -mt-10">Professor</div><br><br>
+            </div><div class="text-xl text-gray-800 -ml-[45%] -mt-10">Professor</div><br>
+            <div class="text-[12px] text-gray-500 italic -ml-[47%] -mt-8 dateDiv">
+            </div><br><br>
             <p style="white-space: pre-line;">{{ post.text }}</p>
             {% if post.images.all %}
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
@@ -162,6 +164,22 @@
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        function getFormattedDate() {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0'); // Ensure 2-digit day
+            const month = months[now.getMonth()]; // Get month abbreviation
+            const year = now.getFullYear(); // Get full year
+            
+            return `${day}-${month}-${year}`;
+        }
+            function updateDateDivs() {
+    document.querySelectorAll('.dateDiv').forEach(div => {
+        div.innerText = getFormattedDate();
+    });
+}
+    updateDateDivs();
+
     $(document).ready(function () {
         // Toggle Comment Form
         $(".comment-toggle").click(function () {
