@@ -24,11 +24,18 @@ def nameandnosender(request):
             number = request.POST.get('transaction_number')
             
             try:
-                item = Message_After_Transaction(username=name,Transaction_Number=number)
+                # Correct field names based on your model
+                item = Message_After_Transaction(username=name, transaction_number=number)
                 item.save()
                 return HttpResponse('<h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1>')
+            
             except Exception as e:
                 messages.error(request, f"An error occurred: {str(e)}")
+                return HttpResponse(f'<h1>ስህተት አለ፡ {str(e)}</h1>')  # Show error in response
+                # Alternatively, redirect to a different page where messages are displayed
+                # return redirect('your_error_page')
+
+    return HttpResponse('<h1>Invalid request</h1>')  # Handle non-POST requests
 def calculate_sum(name, modulus, fidel_pairs):
     """
     Calculate the sum of character values from a name based on a fidel value pair dictionary.

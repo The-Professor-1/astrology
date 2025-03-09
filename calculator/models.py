@@ -8,4 +8,4 @@ class Users(models.Model):
     description = models.CharField(default='',max_length=10000)
 class Message_After_Transaction(models.Model):
     username = models.CharField(max_length=100)
-    Transaction_Number = models.CharField(max_length=100)
+    transaction_number = models.CharField(max_length=100)
