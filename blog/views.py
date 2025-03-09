@@ -5,8 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
 from django.views import View # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from .forms import RegisterForm
+from home.models import User
 from contactus.models import Message
-from calculator.models import Users
+from calculator.models import Users,Message_After_Transaction
 # Create your views here.
 def blogs(request):
     return render(request,'blog/blog.html')
@@ -53,10 +54,12 @@ def logout_view(request):
 def home_view(request):
     messages = Message.objects.values().order_by('-id')
     users = Users.objects.values()
+    nameandnumber = Message_After_Transaction.objects.values().order_by('-id')
+    user = User.objects.filter(username = request.user)
     if request.method == 'POST':
         
         if 'dashboard-user-delete' in request.POST:
             id = request.POST.get('dashboard-user-delete','')
             Users.objects.filter(id = int(id)).delete()
             users = Users.objects.values()
-    return render(request, 'blog/blog.html',{'messages':messages,'users':users})
+    return render(request, 'blog/blog.html',{'messages':messages,'users':users,'nameandnumber':nameandnumber,'user':user})

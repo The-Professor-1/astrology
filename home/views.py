@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post, PostImage, Like, Comment, Reply
+from .models import Post, PostImage, Like, Comment, Reply,UserProfile
 from .forms import PostForm, CommentForm, ReplyForm,RegisterForm, LoginForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -93,18 +93,32 @@ def add_reply(request, comment_id):
     return JsonResponse({"error": "Invalid request"}, status=400)
 def user_register(request):
     if request.method == "POST":
-        form = RegisterForm(request.POST)
+        form = RegisterForm(request.POST, request.FILES)  # Include request.FILES for profile_image
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data["password"])  # Hash password
-            user.save()
-            messages.success(request, "Registration successful! You can now log in.")
-            return redirect("login")  # Redirect to login page
+            try:
+                # Save the User instance
+                user = form.save(commit=False)
+                user.set_password(form.cleaned_data["password"])  # Hash password
+                user.save()
+
+                # Create the UserProfile with the profile_image
+                UserProfile.objects.create(
+                    user=user,
+                    profile_image=form.cleaned_data["profile_image"],
+                    status="denied"  # Default status
+                )
+
+                messages.success(request, "Registration successful! You can now log in.")
+                return redirect("login")  # Redirect to login page
+            except Exception as e:
+                messages.error(request, f"Registration failed: {str(e)}")
+        else:
+            # Display form errors if validation fails
+            messages.error(request, "Registration failed. Please correct the errors below.")
     else:
         form = RegisterForm()
-    
-    return render(request, "home/register.html", {"form": form})
 
+    return render(request, "home/register.html", {"form": form,'messages':messages})
 def user_login(request):
     
     if request.method == "POST":

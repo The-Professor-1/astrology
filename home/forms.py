@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment, Reply,User
+from .models import Post, Comment, Reply,User,UserProfile
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -18,10 +18,10 @@ class ReplyForm(forms.ModelForm):
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
-
+    profile_image = forms.ImageField(label="choose profile image")
     class Meta:
         model = User
-        fields = ["username", "email", "password",]
+        fields = ["username", "email", "password"]
 
     def clean(self):
         cleaned_data = super().clean()
@@ -32,7 +32,17 @@ class RegisterForm(forms.ModelForm):
             self.add_error("confirm_password", "Passwords do not match")
 
         return cleaned_data
-
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+            UserProfile.objects.create(
+                user=user,
+                profile_image=self.cleaned_data["profile_image"],
+                status="denied"
+            )
+        return user
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
