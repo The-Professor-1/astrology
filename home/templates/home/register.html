@@ -11,7 +11,7 @@
                 <p style="color: red;">{{ message }}</p>
             {% endif %}
     {% endif %}
-    <form method="post" class="space-y-4">
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
         <div>
             <label for="{{ form.profile_image.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.profile_image.label }}</label>

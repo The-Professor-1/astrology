@@ -96,15 +96,16 @@ def user_register(request):
         form = RegisterForm(request.POST, request.FILES)  # Include request.FILES for profile_image
         if form.is_valid():
             try:
-                # Save the User instance
-                user = form.save(commit=False)
-                user.set_password(form.cleaned_data["password"])  # Hash password
-                user.save()
+                # Save the user (password already hashed by UserCreationForm)
+                user = form.save()
 
-                # Create the UserProfile with the profile_image
+                # Get the profile image (if uploaded)
+                profile_image = form.cleaned_data.get("profile_image")
+
+                # Create a UserProfile associated with the user
                 UserProfile.objects.create(
                     user=user,
-                    profile_image=form.cleaned_data["profile_image"],
+                    profile_image=profile_image if profile_image else None,  # Handle missing images
                     status="denied"  # Default status
                 )
 
@@ -113,12 +114,11 @@ def user_register(request):
             except Exception as e:
                 messages.error(request, f"Registration failed: {str(e)}")
         else:
-            # Display form errors if validation fails
             messages.error(request, "Registration failed. Please correct the errors below.")
     else:
         form = RegisterForm()
 
-    return render(request, "home/register.html", {"form": form,'messages':messages})
+    return render(request, "home/register.html", {"form": form})
 def user_login(request):
     
     if request.method == "POST":
