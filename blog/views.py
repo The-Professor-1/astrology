@@ -5,7 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
 from django.views import View # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from .forms import RegisterForm
-from home.models import User
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from home.models import User,UserProfile
 from contactus.models import Message
 from calculator.models import Users,Message_After_Transaction
 # Create your views here.
@@ -52,14 +54,40 @@ def logout_view(request):
 # Using the decorator 
 @login_required
 def home_view(request):
-    messages = Message.objects.values().order_by('-id')
+    messages_data = Message.objects.values().order_by('-id')
     users = Users.objects.values()
     nameandnumber = Message_After_Transaction.objects.values().order_by('-id')
-    user = User.objects.filter(username = request.user)
+
     if request.method == 'POST':
-        
+        # Handle user deletion
         if 'dashboard-user-delete' in request.POST:
-            id = request.POST.get('dashboard-user-delete','')
-            Users.objects.filter(id = int(id)).delete()
-            users = Users.objects.values()
-    return render(request, 'blog/blog.html',{'messages':messages,'users':users,'nameandnumber':nameandnumber,'user':user})
+            user_id = request.POST.get('dashboard-user-delete', '')
+            if user_id:
+                try:
+                    user = get_object_or_404(Users, id=int(user_id))  # Ensure the user exists
+                    user.delete()
+                    messages.success(request, "User deleted successfully!")
+                except Exception as e:
+                    messages.error(request, f"An error occurred while deleting the user: {str(e)}")
+
+            users = Users.objects.values()  # Refresh the user list after deletion
+
+        # Handle permission update
+        if 'give_permission_buttton' in request.POST:
+            username = request.POST.get('username')
+            if username:
+                # Update status for UserProfile and Message_After_Transaction models
+                try:
+                    profile = UserProfile.objects.get(username=username)
+                    profile.status = 'allowed'
+                    profile.save()
+                    Message_After_Transaction.objects.filter(username=username).update(status='allowed')
+                    messages.success(request, f"Permissions granted to {username}!")
+                except Exception as e:
+                    messages.error(request, f"An error occurred while updating permissions: {str(e)}")
+
+    return render(request, 'blog/blog.html', {
+        'messages': messages_data,
+        'users': users,
+        'nameandnumber': nameandnumber
+    })

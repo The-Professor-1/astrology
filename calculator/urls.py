@@ -4,7 +4,7 @@ from .views import nameandnosender,calculate,wealth_view,calculators_list,life_l
 
 urlpatterns = [
     path('',calculate ,name='calculate'),
-    path('send_transaction_number/',nameandnosender,name='send_transaction_number'),
+    path('send_transaction_number/',nameandnosender,name='nameandnosender'),
     path('wealth/',wealth_view,name='wealth_calculator'),
     path('calculators/',calculators_list,name="calculator_list"),
     path('behavior/',behavior_view,name='behavior_calculator'),

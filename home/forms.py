@@ -18,7 +18,6 @@ class ReplyForm(forms.ModelForm):
 class RegisterForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     confirm_password = forms.CharField(widget=forms.PasswordInput)
-    profile_image = forms.ImageField(label="choose profile image")
     class Meta:
         model = User
         fields = ["username", "email", "password"]
@@ -39,7 +38,6 @@ class RegisterForm(forms.ModelForm):
             user.save()
             UserProfile.objects.create(
                 user=user,
-                profile_image=self.cleaned_data["profile_image"],
                 status="denied"
             )
         return user

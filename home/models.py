@@ -7,14 +7,6 @@ class UserProfile(models.Model):
     # One-to-one link to the default User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     
-    # Profile image field
-    profile_image = models.ImageField(
-        upload_to='profile_images/',  # Directory where images will be stored
-        null=True, 
-        blank=True, 
-        default='images/default.png' # Optional: default image
-    )
-    
     # Status field with choices and default value
     status = models.CharField(
         max_length=10,

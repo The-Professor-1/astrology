@@ -5,7 +5,7 @@ from django.urls import reverse # type:ignore
 from calculator import library as lb
 from .forms import RegisterForm,GeneralForm
 from .models import Users,Message_After_Transaction
-from home.models import User
+from home.models import User,UserProfile
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -22,10 +22,10 @@ def nameandnosender(request):
         if action == 'send_nameandnumber':
             name = request.POST.get('username')
             number = request.POST.get('transaction_number')
-            
+            status = UserProfile.objects.get(user=request.user).status
             try:
                 # Correct field names based on your model
-                item = Message_After_Transaction(username=name, transaction_number=number)
+                item = Message_After_Transaction(username=name, transaction_number=number,status=status)
                 item.save()
                 return HttpResponse('<h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1>')
             

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Post, PostImage, Like, Comment, Reply,UserProfile
@@ -93,28 +93,31 @@ def add_reply(request, comment_id):
     return JsonResponse({"error": "Invalid request"}, status=400)
 def user_register(request):
     if request.method == "POST":
-        form = RegisterForm(request.POST, request.FILES)  # Include request.FILES for profile_image
-        if form.is_valid():
-            try:
-                # Save the user (password already hashed by UserCreationForm)
-                user = form.save()
+        action = request.POST.get('action')
+        if action == 'register_button':
+            form = RegisterForm(request.POST)  # Include request.FILES for profile_image
+            if form.is_valid():
+                try:
+                    # Save the user
+                    user = form.save()
 
-                # Get the profile image (if uploaded)
-                profile_image = form.cleaned_data.get("profile_image")
+                    # Check if a profile already exists
+                    if not UserProfile.objects.filter(user=user).exists():
+                        UserProfile.objects.create(
+                            user=user,
+                            profile_image=form.cleaned_data.get("profile_image"),
+                            status="denied"
+                        )
 
-                # Create a UserProfile associated with the user
-                UserProfile.objects.create(
-                    user=user,
-                    profile_image=profile_image if profile_image else None,  # Handle missing images
-                    status="denied"  # Default status
-                )
+                    messages.success(request, "Registration successful! You can now log in.")
+                    return redirect("login")
 
-                messages.success(request, "Registration successful! You can now log in.")
-                return redirect("login")  # Redirect to login page
-            except Exception as e:
-                messages.error(request, f"Registration failed: {str(e)}")
+                except Exception as e:
+                    messages.error(request, f"Registration failed: {str(e)}")
+
         else:
             messages.error(request, "Registration failed. Please correct the errors below.")
+    
     else:
         form = RegisterForm()
 

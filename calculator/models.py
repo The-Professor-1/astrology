@@ -9,3 +9,4 @@ class Users(models.Model):
 class Message_After_Transaction(models.Model):
     username = models.CharField(max_length=100)
     transaction_number = models.CharField(max_length=100)
+    status = models.CharField(max_length=100,default='denied')
