@@ -9,14 +9,12 @@
     
 </head>
 <body class="bg-gray-100 text-gray-900">
-    <form method="post">
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto">
+        <form method="post">
+            {% csrf_token %}
+        
         <div class="bg-white shadow-lg flex pt-16 rounded-lg p-6 mb-6">
-            <p class="text-2xl ml-[60%] font-semibold">Welcome, <font color='green'>{{ request.user.username}}</font>!</p>
-            <form action="{% url 'logout' %}" method="post" class="mt-4">
-                {% csrf_token %}
-                <button type="submit" class="bg-red-600 text-white px-4 -mt-16 ml-6  rounded hover:bg-red-700">Logout</button>
-            </form>
+                <a href="{% url 'home' %}"><div class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Back to Home</div></a> 
         </div>
         <div class="text-3xl font-bold mb-4">Name and Transaction Number Messages</div>
         <div class="bg-white shadow-lg rounded-lg p-6">

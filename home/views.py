@@ -123,28 +123,43 @@ def user_register(request):
 
     return render(request, "home/register.html", {"form": form})
 def user_login(request):
-    
     if request.method == "POST":
         form = LoginForm(request.POST)
-        admin = 0
+        admin = 0  # Default value
+        status = "denied"  # Default status
+
         if form.is_valid():
             username = form.cleaned_data["username"]
             password = form.cleaned_data["password"]
-            if username == 'professor':
-                admin = 1
+
+            # Authenticate user
             user = authenticate(request, username=username, password=password)
 
             if user:
+                
+                if user.is_superuser:
+                    admin = 1
+                
+                
+                try:
+                    user_profile = UserProfile.objects.get(user=user)
+                    status = user_profile.status  
+                except UserProfile.DoesNotExist:
+                    status = "not_set"
                 login(request, user)
                 messages.success(request, f"Welcome, {user.username}!")
-                request.session['admin'] = admin
-                return redirect("home")  # Redirect to home page
+                
+                
+                request.session['admin'] = admin 
+                request.session['status'] = status  
+                return redirect("home")
+
             else:
                 messages.error(request, "Invalid username or password.")
     
     else:
         form = LoginForm()
-    
+
     return render(request, "home/login.html", {"form": form})
 
 def user_logout(request):

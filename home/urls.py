@@ -1,6 +1,5 @@
-from django.urls import path
+from django.urls import path,include
 from .views import home, like_post,delete_post, add_comment, add_reply, user_register, user_login, user_logout,delete_comment ,delete_reply
-
 
 urlpatterns = [
     path("", home, name="home"),

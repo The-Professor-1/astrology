@@ -7,6 +7,7 @@
 <!-- Include Font Awesome for Lock Icon -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <center>
+    
 <ul class="space-y-2 w-full lg:w-1/2 mt-24">
         <li>
             <button class="bg-blue-600 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg hover:bg-blue-900 hover:scale-105 hover:text-white" onclick="toggleFAQ('1')">ሁሉንም አገልግሎቶች ለማግኘት</button>
@@ -24,10 +25,11 @@
         </form></div>
         </li>
 </ul>
-</center>
+</center><div class="text-4xl">{{status}}</div>
 <div class="flex flex-wrap justify-center gap-6 mt-20 px-4">
     {% for url, label, image in urls %}
-        {% if forloop.first or admin == 1 %}
+        {% if forloop.first or admin|default:0 == 1 or status|default:''|lower == 'allowed' %}
+
             <!-- Accessible Item (First item or Admin) -->
             <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">
                 <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 

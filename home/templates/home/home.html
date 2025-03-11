@@ -41,6 +41,7 @@
     <!-- Post Form (unchanged) -->
     <center>
     {% if admin == 1 %}
+    <a href="{% url 'blog:dashboard' %}"><div class="w-1/2 p-4 border bg-green-700 text-4xl text-white font-sans rounded-lg">Goto Admin Dashboard</div></a><br>
     <form method="POST" enctype="multipart/form-data" class="bg-white lg:w-1/2 shadow-md p-4 rounded-lg mb-4">
         {% csrf_token %}
         <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..." style="white-space: pre-line;"></textarea>
