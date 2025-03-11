@@ -25,10 +25,10 @@
         </form></div>
         </li>
 </ul>
-</center><div class="text-4xl">{{status}}</div>
+</center>
 <div class="flex flex-wrap justify-center gap-6 mt-20 px-4">
     {% for url, label, image in urls %}
-        {% if forloop.first or admin|default:0 == 1 or status|default:''|lower == 'allowed' %}
+        {% if forloop.first or admin == 1 or status == 'allowed' %}
 
             <!-- Accessible Item (First item or Admin) -->
             <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">

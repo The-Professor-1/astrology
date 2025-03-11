@@ -17,6 +17,8 @@ MARRIAGE_MODULUS = 8
 # Helper function to calculate sum
 def nameandnosender(request):
     if request.method == 'POST':
+        if not request.user.is_authenticated:
+            return redirect("login")
         action = request.POST.get('action')
         
         if action == 'send_nameandnumber':
@@ -193,7 +195,8 @@ def calculators_list(request):
     ('servant_behavior','ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ','home-big-image.png'),
         ]
    admin = request.session.get('admin', 0)
-   return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin})
+   status = request.session.get('status','')
+   return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin,'status':status})
 # Placeholder views
 def servant_behavior(request):
     form = GeneralForm()

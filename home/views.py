@@ -33,6 +33,7 @@ def home(request):
         form = PostForm()
     
     comment_form = CommentForm()
+
     return render(request, "home/home.html", {"form": form, "posts": posts, "comment_form": comment_form,'admin':admin})
 
 @login_required

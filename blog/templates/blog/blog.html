@@ -18,7 +18,7 @@
         </div>
         <div class="text-3xl font-bold mb-4">Name and Transaction Number Messages</div>
         <div class="bg-white shadow-lg rounded-lg p-6">
-            {% if nameandnumber %}
+            {% if userinfo %}
                 <table class="w-full border-collapse border border-gray-300">
                     <thead>
                         <tr class="bg-gray-200">
@@ -29,7 +29,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in nameandnumber %}
+                        {% for i in userinfo %}
                             <tr class="border border-gray-300">
                                 <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
                                 <td class="border border-gray-300 p-3">{{ i.transaction_number }}</td>
@@ -48,7 +48,7 @@
     <br>
     <div class="text-3xl font-bold mb-4">Access Allowed Users</div>
         <div class="bg-white shadow-lg rounded-lg p-6">
-            {% if allowed_users %}
+            {% if allowed %}
                 <table class="w-full border-collapse border border-gray-300">
                     <thead>
                         <tr class="bg-gray-200">
@@ -58,7 +58,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in allowed_users %}
+                        {% for i in allowed %}
                             <tr class="border border-gray-300">
                                 <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
                                 <td class="border border-gray-300 p-3">{{ i.status }}</td>

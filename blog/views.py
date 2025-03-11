@@ -44,8 +44,10 @@ def logout_view(request):
 def home_view(request):
     messages_data = Message.objects.values().order_by('-id')
     users = Users.objects.values()
-    nameandnumber = Message_After_Transaction.objects.values().order_by('-id')
-    allowed_users = Allowed_Users.objects.values()
+    userinfo = Message_After_Transaction.objects.values()
+    allowed = UserProfile.objects.filter(status='allowed')
+    item = Message_After_Transaction.objects.filter(status='allowed')
+    item.delete()
     if request.method == 'POST':
         # Handle user deletion
         if 'dashboard-user-delete' in request.POST:
@@ -70,27 +72,17 @@ def home_view(request):
                     profile.status = 'allowed'
                     profile.save()
 
-                    # Retrieve the message(s) before deleting
-                    messages_to_move = Message_After_Transaction.objects.filter(status='allowed')
-
-                    for message in messages_to_move:
-                        # Move data to Allowed_Users before deletion
-                        Allowed_Users.objects.create(username=message.username, status='allowed')
-
-                    # Delete the original records
-                    messages_to_move.delete()
-
                     messages.success(request, f"Permissions granted to {username}, and record moved to Allowed Users!")
 
                 except UserProfile.DoesNotExist:
                     messages.error(request, f"UserProfile for {username} does not exist.")
                 except Exception as e:
                     messages.error(request, f"An error occurred while updating permissions: {str(e)}")
-
+            allowed = UserProfile.objects.filter(status='allowed')
 
     return render(request, 'blog/blog.html', {
         'messages': messages_data,
         'users': users,
-        'nameandnumber': nameandnumber,
-        'allowed_users': allowed_users
+        'userinfo':userinfo,
+        'allowed': allowed
     })
