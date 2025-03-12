@@ -61,7 +61,7 @@
                         {% for i in allowed %}
                             <tr class="border border-gray-300">
                                 <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.status }}</td>
+                                <td class="border border-gray-300 p-3">{{ i.profile.status }}</td>
                                 <td class="border border-gray-300 p-3 flex gap-2 justify-center">
                                     <button name="remove_permission_button" value="{{i.username}}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-green-700">Deny</button>
                                 </td>

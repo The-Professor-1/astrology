@@ -43,11 +43,10 @@ def logout_view(request):
 @login_required
 def home_view(request):
     messages_data = Message.objects.values().order_by('-id')
+    user = User.objects.values()
     users = Users.objects.values()
     userinfo = Message_After_Transaction.objects.values()
-    allowed = UserProfile.objects.filter(status='allowed')
-    item = Message_After_Transaction.objects.filter(status='allowed')
-    item.delete()
+    allowed = User.objects.filter(profile__status='allowed')
     if request.method == 'POST':
         # Handle user deletion
         if 'dashboard-user-delete' in request.POST:
@@ -64,21 +63,33 @@ def home_view(request):
 
         # Handle permission update
         if 'give_permission_button' in request.POST:
-            username = request.POST.get('username', '')  # Ensure the correct input field name
+            username = request.POST.get('give_permission_button', '')  # Ensure the correct input field name
+            
             if username:
                 try:
                     # Update status for UserProfile
                     profile = UserProfile.objects.get(user__username=username)
+                    print(profile)
+                    approveduser = Message_After_Transaction.objects.get(username=username)
+                    print(approveduser)
+                    
+                    # Fix: Assign and save individually
                     profile.status = 'allowed'
                     profile.save()
-
+                    approveduser.delete()  # Assuming this model doesn’t need status update before deletion
+                    
+                    print('done')
+                    userinfo = Message_After_Transaction.objects.values()  # Unused here, but kept for context
                     messages.success(request, f"Permissions granted to {username}, and record moved to Allowed Users!")
-
                 except UserProfile.DoesNotExist:
-                    messages.error(request, f"UserProfile for {username} does not exist.")
+                    messages.error(request, f"User {username} not found.")
+                except Message_After_Transaction.DoesNotExist:
+                    messages.error(request, f"Transaction record for {username} not found.")
                 except Exception as e:
-                    messages.error(request, f"An error occurred while updating permissions: {str(e)}")
-            allowed = UserProfile.objects.filter(status='allowed')
+                    messages.error(request, f"An error occurred: {str(e)}")
+            
+            # Refresh allowed queryset after update
+            allowed = User.objects.filter(profile__status='allowed')
 
     return render(request, 'blog/blog.html', {
         'messages': messages_data,
