@@ -3,6 +3,8 @@ from django.contrib.auth.models import User # type:ignore
 
 
 # Create your models here.
+class TransactionNumber(models.Model):
+    transaction_number = models.CharField(max_length=100)
 class UserProfile(models.Model):
     # One-to-one link to the default User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

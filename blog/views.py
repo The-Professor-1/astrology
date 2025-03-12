@@ -66,31 +66,35 @@ def home_view(request):
             username = request.POST.get('give_permission_button', '')  # Ensure the correct input field name
             
             if username:
-                try:
-                    # Update status for UserProfile
-                    profile = UserProfile.objects.get(user__username=username)
-                    print(profile)
-                    approveduser = Message_After_Transaction.objects.get(username=username)
-                    print(approveduser)
-                    
-                    # Fix: Assign and save individually
-                    profile.status = 'allowed'
-                    profile.save()
-                    approveduser.delete()  # Assuming this model doesn’t need status update before deletion
-                    
-                    print('done')
-                    userinfo = Message_After_Transaction.objects.values()  # Unused here, but kept for context
-                    messages.success(request, f"Permissions granted to {username}, and record moved to Allowed Users!")
-                except UserProfile.DoesNotExist:
-                    messages.error(request, f"User {username} not found.")
-                except Message_After_Transaction.DoesNotExist:
-                    messages.error(request, f"Transaction record for {username} not found.")
-                except Exception as e:
-                    messages.error(request, f"An error occurred: {str(e)}")
+                profile = UserProfile.objects.get(user__username=username)
+                if profile.status == 'allowed':
+                    Message_After_Transaction.objects.filter(username=username).delete()
+                    userinfo = Message_After_Transaction.objects.values()
+                else:
+                    try:
+                        profile.status = 'allowed'
+                        profile.save()
+                        Message_After_Transaction.objects.filter(username=username).delete()
+                        userinfo = Message_After_Transaction.objects.values()
+                        messages.success(request, f"Permissions granted to {username}, and record moved to Allowed Users!")
+                    except UserProfile.DoesNotExist:
+                        messages.error(request, f"User {username} not found.")
+                    except Message_After_Transaction.DoesNotExist:
+                        messages.error(request, f"Transaction record for {username} not found.")
+                    except Exception as e:
+                        messages.error(request, f"An error occurred: {str(e)}")
             
             # Refresh allowed queryset after update
             allowed = User.objects.filter(profile__status='allowed')
-
+        if 'remove_permission_button' in request.POST:
+            username = request.POST.get('remove_permission_button', '')  # Ensure the correct input field name
+            profile = UserProfile.objects.get(user__username=username)
+            profile.status = 'denied'
+            profile.save()
+            Message_After_Transaction(username=username,transaction_number="second_denied",status="denied").save()
+            userinfo = Message_After_Transaction.objects.values()
+            Allowed_Users.objects.filter(username=username).delete()
+            allowed = User.objects.filter(profile__status='allowed')
     return render(request, 'blog/blog.html', {
         'messages': messages_data,
         'users': users,

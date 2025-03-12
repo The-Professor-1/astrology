@@ -5,7 +5,7 @@ from django.urls import reverse # type:ignore
 from calculator import library as lb
 from .forms import RegisterForm,GeneralForm
 from .models import Users,Message_After_Transaction
-from home.models import User,UserProfile
+from home.models import User,UserProfile,TransactionNumber
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -23,19 +23,32 @@ def nameandnosender(request):
         
         if action == 'send_nameandnumber':
             name = request.POST.get('username')
+            if name == 'professor':
+                return HttpResponse(f"<center><h1><font color='blue'>እርስዎ የድርጅቱ ባለቤት ስልሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም፡፡</font></h1><br>"
+                                    f"<font color='blue'><h2><a href='{reverse('calculator_list')}'>ወደ ዋናው ገፅ ለመመለስ</a></h2></font></center>")
             number = request.POST.get('transaction_number')
             status = UserProfile.objects.get(user=request.user).status
-            try:
-                # Correct field names based on your model
-                item = Message_After_Transaction(username=name, transaction_number=number,status=status)
-                item.save()
-                return HttpResponse('<h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1>')
-            
-            except Exception as e:
-                messages.error(request, f"An error occurred: {str(e)}")
-                return HttpResponse(f'<h1>ስህተት አለ፡ {str(e)}</h1>')  # Show error in response
+            trno = TransactionNumber.objects.filter(transaction_number=number)
+            if (len(trno) == 0) and (status == 'denied'):
+                try:
+                    # Correct field names based on your model
+                    trno = TransactionNumber(transaction_number=number)
+                    trno.save()
+                    item = Message_After_Transaction(username=name, transaction_number=number,status=status)
+                    item.save()
+                    return HttpResponse(
+    f"<center><font color='green'><h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1><br><br></font>"
+    f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
+)
+                except Exception as e:
+                    messages.error(request, f"An error occurred: {str(e)}")
+                    return HttpResponse(f'<h1>ስህተት አለ፡ {str(e)}</h1>')  # Show error in response
                 # Alternatively, redirect to a different page where messages are displayed
                 # return redirect('your_error_page')
+            else:
+                return HttpResponse(
+            f"<center><font color='red'><h1>የመረጃ ስህተት አለ፡፡ እንደገና ይሞክሩ፡፡</h1><br><br></font>"f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
+        )
 
     return HttpResponse('<h1>Invalid request</h1>')  # Handle non-POST requests
 def calculate_sum(name, modulus, fidel_pairs):
