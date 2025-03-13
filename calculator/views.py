@@ -5,7 +5,7 @@ from django.urls import reverse # type:ignore
 from calculator import library as lb
 from .forms import RegisterForm,GeneralForm
 from .models import Users,Message_After_Transaction
-from home.models import User,UserProfile,TransactionNumber
+from home.models import User,UserProfile,TransactionNumber,SiteStats
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -13,6 +13,7 @@ WEALTH_MODULUS = 4
 BEHAVIOR_MODULUS = 9
 SERVANT_MODULUS = 5
 MARRIAGE_MODULUS = 8
+
 
 # Helper function to calculate sum
 def nameandnosender(request):
@@ -99,6 +100,9 @@ def behavior_calculator(name):
 
 # Views
 def calculate(request):
+    stats, created = SiteStats.objects.get_or_create(id=1)
+    stats.kokeb_calculator_visits += 1
+    stats.save()
     form = GeneralForm
     user = None
     address = 'kokeb_calculator'
@@ -123,7 +127,7 @@ def calculate(request):
             description = Users.objects.filter(sign=title).values_list('description', flat=True).first()
             context = {'sign': title, 'description': description}
             return render(request, 'calculator/description.html', context)
-    return render(request, 'calculator/general.html', {'form': form, 'user': user,'address':address})
+    return render(request, 'calculator/general.html', {'form': form, 'user': user,'address':address,'kokeb_calculator_visit':stats.kokeb_calculator_visits})
 
 def wealth_view(request):
     form = GeneralForm()
@@ -190,7 +194,10 @@ def marriage_luck_view(request):
     return render(request, 'calculator/general.html', {'form': form, 'result': result,'address':address})
 
 def calculators_list(request):
-   urls = [
+    stats, created = SiteStats.objects.get_or_create(id=1)
+    stats.calculators_list_visits += 1
+    stats.save()
+    urls = [
     ('calculate', 'ኮከብዎን ለማዎቅ','home-big-image.png'),
     ('wealth_calculator', 'የሃብት እጣ ፈንታን ለማወቅ','home-big-image.png'),
     ('behavior_calculator', 'ስለ ጠባይ ለማወቅ','home-big-image.png'),
@@ -207,9 +214,9 @@ def calculators_list(request):
     ('military_prophecy', 'ወደ ጦርነት ለሄደ ወይም ለሚሄድ','home-big-image.png'),
     ('servant_behavior','ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ','home-big-image.png'),
         ]
-   admin = request.session.get('admin', 0)
-   status = request.session.get('status','')
-   return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin,'status':status})
+    admin = request.session.get('admin', 0)
+    status = request.session.get('status','')
+    return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin,'status':status,'calculators_list_visit':stats.calculators_list_visits})
 # Placeholder views
 def servant_behavior(request):
     form = GeneralForm()

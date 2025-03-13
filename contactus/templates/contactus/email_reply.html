@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Contact Us{% endblock title %}
+
+{% block body %}
+<div class="flex justify-center mt-20">
+    <div class="bg-white w-[90%] max-w-md p-6 rounded-lg shadow-lg border border-gray-200">
+        <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Email Reply</h1>
+        
+        <form method="post" class="mt-6 space-y-4">
+            {% csrf_token %}
+
+            
+                <div>
+                    <label for="{{ form.email_to.id_for_label }}" class="block text-gray-700 font-medium">{{ form.email_to.label }}</label>
+                    {{ form.email_to|add_class:"w-full border border-gray-400 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none" }}<br><br>
+                    <label for="{{ form.subject.id_for_label }}" class="block text-gray-700 font-medium">{{ form.subject.label }}</label>
+                    {{ form.subject|add_class:"w-full border border-gray-400 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none" }}<br><br>
+                        <label for="{{ form.message.id_for_label }}" class="block text-gray-700 font-medium">{{ form.message.label }}</label>
+                        {{ form.message|add_class:"w-full h-32 border border-gray-400 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none" }}
+                    
+                </div>
+            
+
+            <div class="flex justify-between mt-6">
+                <button name="action" value="email_reply_button" type="submit" class="w-72 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-all">
+                    Reply
+                </button>
+                <button type="reset" class="w-24 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition-all">
+                    Clear
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock body %}

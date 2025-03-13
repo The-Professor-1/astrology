@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('calculator/',include('calculator.urls')),
     path('contact/',include('contactus.urls')),
-    path('AdminDashboard/',include('blog.urls')),
+    path('ThisIsGoingToBeAdminDashboardUrlAndIamMakingItsoLongToPreventAccess/',include('blog.urls')),
     path('home/',include('home.urls'),name='home'),
     path('aboutus/',include('aboutus.urls')),
     path('',include('home.urls')),

@@ -3,6 +3,10 @@ from django.contrib.auth.models import User # type:ignore
 
 
 # Create your models here.
+class SiteStats(models.Model):
+    home_page_visits = models.PositiveIntegerField(default=0)
+    kokeb_calculator_visits = models.PositiveIntegerField(default=0)
+    calculators_list_visits = models.PositiveIntegerField(default=0)
 class TransactionNumber(models.Model):
     transaction_number = models.CharField(max_length=100)
 class UserProfile(models.Model):

@@ -5,9 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
 from django.views import View # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from .forms import RegisterForm
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404,reverse
 from django.contrib import messages
-from home.models import User,UserProfile
+from home.models import User,UserProfile,SiteStats
 from contactus.models import Message
 from calculator.models import Users,Message_After_Transaction,Allowed_Users
 # Create your views here.
@@ -95,9 +95,37 @@ def home_view(request):
             userinfo = Message_After_Transaction.objects.values()
             Allowed_Users.objects.filter(username=username).delete()
             allowed = User.objects.filter(profile__status='allowed')
-    return render(request, 'blog/blog.html', {
+        if 'dashboard_message_delete' in request.POST:
+            message_id = request.POST.get('dashboard_message_delete', '')
+            if message_id:
+                try:
+                    message = get_object_or_404(Message, id=int(message_id))  # Ensure the message exists
+                    message.delete()
+                    messages.success(request, "Message deleted successfully!")
+                except Exception as e:
+                    messages.error(request, f"An error occurred while deleting the message: {str(e)}")
+        if 'dashboard_message_reply' in request.POST:
+            email_to = request.POST.get('dashboard_message_reply', '')
+            return redirect(f"{reverse('contact:reply')}?email_to={email_to}")
+    allowed_users = UserProfile.objects.filter(status='allowed')
+    registered_users = User.objects.all()
+    
+    # Count directly instead of looping
+    noofregistered = registered_users.count() - 2  # Subtract the two superusers
+    noofallowed = allowed_users.count()
+    # Ensure we fetch the first SiteStats instance
+    stats = SiteStats.objects.first()
+
+    # Ensure stats exist, fallback to 0 if not
+    context = {
+        "home_page_visit": stats.home_page_visits if stats else 0,
+        "calculators_list_visit": stats.calculators_list_visits if stats else 0,
+        "kokeb_calculator_visit": stats.kokeb_calculator_visits if stats else 0,
+        "noofallowed": noofallowed,
+        "noofregistered": noofregistered,
         'messages': messages_data,
         'users': users,
         'userinfo':userinfo,
-        'allowed': allowed
-    })
+        'allowed': allowed,
+    }
+    return render(request, 'blog/blog.html',context)

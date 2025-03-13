@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post, PostImage, Like, Comment, Reply,UserProfile
+from .models import Post, PostImage, Like, Comment, Reply,UserProfile,SiteStats
 from .forms import PostForm, CommentForm, ReplyForm,RegisterForm, LoginForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 
-
 def home(request):
+    stats, created = SiteStats.objects.get_or_create(id=1)
+    stats.home_page_visits += 1
+    stats.save()
     posts = Post.objects.prefetch_related("images", "likes", "comments__replies").order_by("-created_at")
     admin = request.session.get('admin', 0)
     if request.method == "POST":
@@ -34,7 +36,7 @@ def home(request):
     
     comment_form = CommentForm()
 
-    return render(request, "home/home.html", {"form": form, "posts": posts, "comment_form": comment_form,'admin':admin})
+    return render(request, "home/home.html", {"form": form, "posts": posts,"home_page_visit": stats.home_page_visits, "comment_form": comment_form,'admin':admin})
 
 @login_required
 def like_post(request, post_id):
