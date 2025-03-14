@@ -58,11 +58,12 @@ WSGI_APPLICATION = 'astrology.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'mydb'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'maymer123'),
-        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'NAME': os.getenv('DB_NAME', 'neondb'),
+        'USER': os.getenv('DB_USER', 'neondb_owner'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'npg_npXoUD4arN8I'),
+        'HOST': os.getenv('DB_HOST', 'ep-flat-frog-a5axh07n-pooler.us-east-2.aws.neon.tech'),
         'PORT': os.getenv('DB_PORT', '5432'),
+        'OPTIONS': {'sslmode': 'require'}
     }
 }
 
