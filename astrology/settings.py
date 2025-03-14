@@ -78,6 +78,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+MEDIA_ROOT = '/tmp/'  # Where uploaded files are saved
+MEDIA_URL = '/media/'
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
