@@ -5,7 +5,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ko!nbxq^_s2&)o^4w!ya+t_)9u_25zcmdh)u3@hq26knoz$p*d')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'sinekewakibt.vercel.app').split(',')
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
