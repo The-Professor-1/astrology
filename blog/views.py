@@ -77,7 +77,7 @@ def home_view(request):
                         Message_After_Transaction.objects.filter(username=username).delete()
                         userinfo = Message_After_Transaction.objects.values()
                         messages.success(request, f"Permissions granted to {username}, and record moved to Allowed Users!")
-                        request.session.modified = True
+                        
                     except UserProfile.DoesNotExist:
                         messages.error(request, f"User {username} not found.")
                     except Message_After_Transaction.DoesNotExist:

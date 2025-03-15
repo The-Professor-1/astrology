@@ -8,6 +8,7 @@ from .models import Users,Message_After_Transaction
 from home.models import User,UserProfile,TransactionNumber,SiteStats
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -200,7 +201,9 @@ def marriage_luck_view(request):
             except Exception as e:
                 messages.error(request, f"Error calculating marriage luck: {str(e)}")
     return render(request, 'calculator/general.html', {'form': form, 'result': result,'address':address})
-
+def check_status(request):
+    status = request.session.get('status', '')
+    return JsonResponse({'status': status})
 def calculators_list(request):
     stats, created = SiteStats.objects.get_or_create(id=1)
     stats.calculators_list_visits += 1

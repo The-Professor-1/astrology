@@ -118,6 +118,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetch("{% url 'check_status' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'allowed') {
+                    location.reload(); // Refresh page only if status updated
+                }
+            });
+    });
+</script>
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         const showMoreBtn = document.getElementById("showMoreBtn");
         if (showMoreBtn) {

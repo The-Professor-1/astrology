@@ -1,9 +1,10 @@
 from django.contrib import admin # type: ignore
 from django.urls import path,include # type: ignore
-from .views import nameandnosender,calculate,wealth_view,calculators_list,life_luck,behavior_view,place_view,marriage_luck_view,military_prophecy,love_prophecy,legal_prophecy,marriage_length_prophecy,enemy_behavior,patient_prophecy,pregnancy_prophecy,birth_prophecy,servant_behavior
+from .views import nameandnosender,check_status,calculate,wealth_view,calculators_list,life_luck,behavior_view,place_view,marriage_luck_view,military_prophecy,love_prophecy,legal_prophecy,marriage_length_prophecy,enemy_behavior,patient_prophecy,pregnancy_prophecy,birth_prophecy,servant_behavior
 
 urlpatterns = [
     path('',calculate ,name='calculate'),
+    path('check-status/', check_status, name='check_status'),
     path('send_transaction_number/',nameandnosender,name='nameandnosender'),
     path('wealth/',wealth_view,name='wealth_calculator'),
     path('calculators/',calculators_list,name="calculator_list"),
