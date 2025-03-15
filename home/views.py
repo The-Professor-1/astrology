@@ -98,7 +98,7 @@ def user_register(request):
     if request.method == "POST":
         action = request.POST.get('action')
         if action == 'register_button':
-            form = RegisterForm(request.POST)  # Include request.FILES for profile_image
+            form = RegisterForm(request.POST)
             if form.is_valid():
                 try:
                     # Save the user
@@ -108,7 +108,6 @@ def user_register(request):
                     if not UserProfile.objects.filter(user=user).exists():
                         UserProfile.objects.create(
                             user=user,
-                            profile_image=form.cleaned_data.get("profile_image"),
                             status="denied"
                         )
 
@@ -117,10 +116,10 @@ def user_register(request):
 
                 except Exception as e:
                     messages.error(request, f"Registration failed: {str(e)}")
-
+            else:
+                messages.error(request, "Registration failed. Please correct the errors below.")
         else:
-            messages.error(request, "Registration failed. Please correct the errors below.")
-    
+            messages.error(request, "Invalid form submission.")
     else:
         form = RegisterForm()
 
@@ -132,34 +131,37 @@ def user_login(request):
         status = "denied"  # Default status
 
         if form.is_valid():
-            username = form.cleaned_data["username"]
+            username = form.cleaned_data["username"].lower()  # Convert to lowercase for case-insensitive login
             password = form.cleaned_data["password"]
+
+            # Check if username exists
+            user_exists = User.objects.filter(username=username).exists()
 
             # Authenticate user
             user = authenticate(request, username=username, password=password)
 
             if user:
-                
                 if user.is_superuser:
                     admin = 1
-                
                 
                 try:
                     user_profile = UserProfile.objects.get(user=user)
                     status = user_profile.status  
                 except UserProfile.DoesNotExist:
                     status = "not_set"
+                
                 login(request, user)
                 messages.success(request, f"Welcome, {user.username}!")
-                
                 
                 request.session['admin'] = admin 
                 request.session['status'] = status  
                 return redirect("home")
-
             else:
-                messages.error(request, "Invalid username or password.")
-    
+                if user_exists:
+                    messages.error(request, "Password is incorrect for this username.")
+                else:
+                    messages.error(request, "Username or password is incorrect.")
+
     else:
         form = LoginForm()
 

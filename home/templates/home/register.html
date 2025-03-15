@@ -1,36 +1,106 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block body %}
-<script src="https://cdn.tailwindcss.com"></script>
 <div class="max-w-lg mx-auto bg-white shadow-lg rounded-lg mt-24 p-6 mt-10">
     <h2 class="text-2xl font-bold text-center mb-4">Register</h2>
+    
     {% if messages %}
+        {% for message in messages %}
             {% if message.tags == "success" %}
-                <p style="color: green;">{{ message }}</p>
+                <p class="text-green-600 text-center mb-4">{{ message }}</p>
             {% elif message.tags == "error" %}
-                <p style="color: red;">{{ message }}</p>
+                <p class="text-red-600 text-center mb-4">{{ message }}</p>
             {% endif %}
+        {% endfor %}
     {% endif %}
+
     <form method="post" action="{% url 'register' %}" class="space-y-4">
         {% csrf_token %}
+        
         <div>
             <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.username.label }}</label>
-            {{ form.username|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2" }}
+            {{ form.username|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2"|add_class:"{% if form.username.errors %}border-red-500{% endif %}" }}
+            {% if form.username.errors %}
+                <ul class="text-red-500 text-sm">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
+
         <div>
             <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Email</label>
-            {{ form.email|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2" }}
+            {{ form.email|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2"|add_class:"{% if form.email.errors %}border-red-500{% endif %}" }}
+            {% if form.email.errors %}
+                <ul class="text-red-500 text-sm">
+                    {% for error in form.email.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
-        <div>
+
+        <div class="relative">
             <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.password.label }}</label>
-            {{ form.password|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2" }}
+            {{ form.password|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2 pr-10"|add_class:"{% if form.password.errors or form.non_field_errors %}border-red-500{% endif %}" }}
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer toggle-password top-6">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path class="eye" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9C6.27 3 2 12 2 12s4.27 9 10 9 10-9 10-9-4.27-9-10-9z"/>
+                    <path class="eye-slash hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M9.88 9.88a3 3 0 104.24 4.24M12 3c5.73 0 10 9 10 9s-1.73 3.46-4.5 5.66"/>
+                </svg>
+            </span>
+            {% if form.password.errors %}
+                <ul class="text-red-500 text-sm">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
-        <div>
+
+        <div class="relative">
             <label for="{{ form.confirm_password.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.confirm_password.label }}</label>
-            {{ form.confirm_password|add_class:"w-full focus:ring-2 focus:ring-green-500 outline-none border border-gray-300 rounded-lg p-2" }}
+            {{ form.confirm_password|add_class:"w-full border focus:ring-2 focus:ring-green-500 outline-none border-gray-300 rounded-lg p-2 pr-10"|add_class:"{% if form.password.errors or form.non_field_errors %}border-red-500{% endif %}" }}
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer toggle-password top-6">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path class="eye" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm-3-9C6.27 3 2 12 2 12s4.27 9 10 9 10-9 10-9-4.27-9-10-9z"/>
+                    <path class="eye-slash hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18M9.88 9.88a3 3 0 104.24 4.24M12 3c5.73 0 10 9 10 9s-1.73 3.46-4.5 5.66"/>
+                </svg>
+            </span>
+            {% if form.non_field_errors %}
+                <ul class="text-red-500 text-sm">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
+
         <button type="submit" name="action" value="register_button" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">Register</button>
     </form>
+    
     <p class="text-center text-sm text-gray-600 mt-4">Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login here</a></p>
 </div>
+
+<script>
+// Password visibility toggle
+document.querySelectorAll('.toggle-password').forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const input = this.previousElementSibling;
+        const eye = this.querySelector('.eye');
+        const eyeSlash = this.querySelector('.eye-slash');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            eye.classList.add('hidden');
+            eyeSlash.classList.remove('hidden');
+        } else {
+            input.type = 'password';
+            eye.classList.remove('hidden');
+            eyeSlash.classList.add('hidden');
+        }
+    });
+});
+</script>
 {% endblock %}

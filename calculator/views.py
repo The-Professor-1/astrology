@@ -1,11 +1,13 @@
 from django.shortcuts import render,redirect # type:ignore
-from django.http import HttpResponse # type:ignore
+from django.http import HttpResponse,HttpResponseForbidden # type:ignore
 from django.contrib import messages # type:ignore
 from django.urls import reverse # type:ignore
 from calculator import library as lb
 from .forms import RegisterForm,GeneralForm
 from .models import Users,Message_After_Transaction
 from home.models import User,UserProfile,TransactionNumber,SiteStats
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 # Constants for modulus values
 KOKEB_MODULUS = 12
 PLACE_MODULUS = 7
@@ -14,7 +16,24 @@ BEHAVIOR_MODULUS = 9
 SERVANT_MODULUS = 5
 MARRIAGE_MODULUS = 8
 
+def profile_permission_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        # Get the user from the session
+        user = request.user
+        
+        # Check if the user has a related UserProfile
+        try:
+            profile = get_object_or_404(UserProfile, user=user)
+        except UserProfile.DoesNotExist:
+            return HttpResponse("<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</font></h2></a></center>")
 
+        # Check if the user's profile status is allowed (status='allowed' in your case)
+        if profile.status != 'allowed':
+            return HttpResponse("<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</h2></font></a></center>")
+
+        return view_func(request, *args, **kwargs)
+    
+    return _wrapped_view
 # Helper function to calculate sum
 def nameandnosender(request):
     if request.method == 'POST':
@@ -53,17 +72,6 @@ def nameandnosender(request):
 
     return HttpResponse('<h1>Invalid request</h1>')  # Handle non-POST requests
 def calculate_sum(name, modulus, fidel_pairs):
-    """
-    Calculate the sum of character values from a name based on a fidel value pair dictionary.
-    
-    Args:
-        name (str or list): The input name to process.
-        modulus (int): The modulus value to apply to the sum.
-        fidel_pairs (dict): A dictionary mapping character groups to their values.
-    
-    Returns:
-        int: The calculated sum modulo the given modulus.
-    """
     total_sum = 0
     for char in name:
         for key, value in fidel_pairs.items():
@@ -128,7 +136,7 @@ def calculate(request):
             context = {'sign': title, 'description': description}
             return render(request, 'calculator/description.html', context)
     return render(request, 'calculator/general.html', {'form': form, 'user': user,'address':address,'kokeb_calculator_visit':stats.kokeb_calculator_visits})
-
+@profile_permission_required
 def wealth_view(request):
     form = GeneralForm()
     result = None
@@ -144,7 +152,7 @@ def wealth_view(request):
             except Exception as e:
                 messages.error(request, f"Error calculating wealth: {str(e)}")
     return render(request, 'calculator/general.html', {'form': form, 'result': result,'address':address})
-
+@profile_permission_required
 def behavior_view(request):
     form = GeneralForm()
     result = None
@@ -159,7 +167,7 @@ def behavior_view(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {'form': form, 'result': result,'address':address})
-
+@profile_permission_required
 def place_view(request):
     form = GeneralForm()
     result = None
@@ -176,7 +184,7 @@ def place_view(request):
             except Exception as e:
                 messages.error(request, f"Error calculating place luck: {str(e)}")
     return render(request, 'calculator/general.html', {'form': form, 'result': result,'address':address})
-
+@profile_permission_required
 def marriage_luck_view(request):
     form = GeneralForm()
     address = 'marriage_luck'
@@ -218,6 +226,7 @@ def calculators_list(request):
     status = request.session.get('status','')
     return render(request, 'calculator/calculator_list.html', {'urls': urls, 'admin': admin,'status':status,'calculators_list_visit':stats.calculators_list_visits})
 # Placeholder views
+@profile_permission_required
 def servant_behavior(request):
     form = GeneralForm()
     url = 'servant_behavior'
@@ -235,7 +244,7 @@ def servant_behavior(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def birth_prophecy(request):
     form = GeneralForm()
     url = 'born_prophecy_calculator'
@@ -255,7 +264,7 @@ def birth_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def love_prophecy(request):
     form = GeneralForm()
     url = 'love_prophecy_calculator'
@@ -273,7 +282,7 @@ def love_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def pregnancy_prophecy(request):
     form = GeneralForm()
     url = 'pregnancy_prophecy_calculator'
@@ -291,7 +300,7 @@ def pregnancy_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def military_prophecy(request):
     form = GeneralForm()
     url = 'military_prophecy_calculator'
@@ -311,6 +320,8 @@ def military_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
+
+@profile_permission_required
 def life_luck(request):
     form = GeneralForm()
     url = 'life_luck_calculator'
@@ -329,7 +340,7 @@ def life_luck(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def patient_prophecy(request):
     form = GeneralForm()
     url = 'patient_prophecy_calculator'
@@ -351,7 +362,7 @@ def patient_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def legal_prophecy(request):
     form = GeneralForm()
     url = 'legal_calculator'
@@ -371,7 +382,7 @@ def legal_prophecy(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def enemy_behavior(request):
     form = GeneralForm()
     url = 'enemy_behavior_calculator'
@@ -387,7 +398,7 @@ def enemy_behavior(request):
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request,'calculator/general.html' ,{'form':form,'address':url,'result':result})
-
+@profile_permission_required
 def marriage_length_prophecy(request):
     form = GeneralForm()
     url = 'marriage_length'

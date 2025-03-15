@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ko!nbxq^_s2&)o^4w!ya+t_)9u_25zcmdh)u3@hq26knoz$p*d')
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,sinekewakibt-git-main-the-professor-1s-projects.vercel.app,sinekewakibt-ozj7o11tf-the-professor-1s-projects.vercel.app,sinekewakibt.vercel.app').split(',')
 
 INSTALLED_APPS = [
@@ -85,5 +85,14 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# For local development
+SESSION_COOKIE_DOMAIN = os.getenv('SESSION_DOMAIN', None) # Ensure the leading dot for subdomains
+SESSION_COOKIE_PATH = '/'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Ensure you're using the DB backend
+
+LOGIN_URL = '/home/login/'  # Or wherever your login view is located
+LOGIN_REDIRECT_URL = '/home/'  # Redirect after login
+LOGOUT_REDIRECT_URL = '/home/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

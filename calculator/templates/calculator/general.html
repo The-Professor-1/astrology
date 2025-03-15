@@ -9,7 +9,10 @@
     {% if address == 'kokeb_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Astrology Sign Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+                <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                    <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                    </p>
+                </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
         {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
@@ -31,7 +34,10 @@
     {% elif address == 'wealth_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Wealth Luck Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
         {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
@@ -51,7 +57,10 @@
     {% elif address == 'behavior_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Behavior Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <button type="submit" name="action" value="behavior_calculate" class="relative border-green-800 rounded-lg  mt-10 h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
         <button type="reset" name="reset" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-red-600 text-white text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
@@ -69,7 +78,10 @@
     {% elif address == 'marriage_luck' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Luck Calculator</h1>
-            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
         {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
         {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br><br>
@@ -88,7 +100,10 @@
     {% elif address == 'place_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Place Luck Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.your_spouse_name.id_for_label }}" class="my-label-class">{{ form.your_spouse_name.label }}</label>
         {{ form.your_spouse_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -111,7 +126,10 @@
     {% elif address == 'servant_behavior' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Servant Behavior Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.servant_name.id_for_label }}" class="my-label-class">{{ form.servant_name.label }}</label>
         {{ form.servant_name|add_class:"mt-4 border-2 relative border-gray-400 rounded-sm"  }}<br>
@@ -131,7 +149,10 @@
     {% elif address == 'legal_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Legal Case Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.judje_name.id_for_label }}" class="my-label-class">{{ form.judge_name.label }}</label>
         {{ form.judge_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -153,7 +174,10 @@
     {% elif address == 'marriage_length' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Length Calculator</h1>
-            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
         {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
         {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -173,7 +197,10 @@
     {% elif address == 'life_luck_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Life Luck Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div> <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.your_mothers_name.id_for_label }}" class="my-label-class">{{ form.your_mothers_name.label }}</label>
         {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -193,7 +220,10 @@
     {% elif address == 'enemy_behavior_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Enemy Behavior Calculator</h1>
-            <label for="{{ form.enemy_name.id_for_label }}" class="my-label-class">{{ form.enemy_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.enemy_name.id_for_label }}" class="my-label-class">{{ form.enemy_name.label }}</label>
         {{ form.enemy_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <br>
         <button type="submit" name="action" value="enemy_behavior_calculate" class="relative border-green-800 rounded-lg h-8 lg:h-10 bg-green-600 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -211,7 +241,10 @@
     {% elif address == 'born_prophecy_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Child Birth Calculator</h1>
-            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
         {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
         {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -233,7 +266,10 @@
     {% elif address == 'pregnancy_prophecy_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Pregnancy Prophecy Calculator</h1>
-            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div> <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
         {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
         {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -253,7 +289,10 @@
     {% elif address == 'patient_prophecy_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Patient Prophecy Calculator</h1>
-            <label for="{{ form.patient_name.id_for_label }}" class="my-label-class">{{ form.patient_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div> <label for="{{ form.patient_name.id_for_label }}" class="my-label-class">{{ form.patient_name.label }}</label>
         {{ form.patient_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.patient_mother_name.id_for_label }}" class="my-label-class">{{ form.patient_mother_name.label }}</label>
         {{ form.patient_mother_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -278,7 +317,10 @@
     {% elif address == 'love_prophecy_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Love Prophecy Calculator</h1>
-            <label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.husbands_name.id_for_label }}" class="my-label-class">{{ form.husbands_name.label }}</label>
         {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.wifes_name.id_for_label }}" class="my-label-class">{{ form.wifes_name.label }}</label>
         {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
@@ -298,7 +340,10 @@
     {% elif address == 'military_prophecy_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">War Prophecy Calculator</h1>
-            <label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
+            <div class="w-full text-red-700 lg:text-sm text-xs lg:w-full bg-white shadow-lg rounded-lg">
+                <p class="mt-4">ማሳሰቢያ፡ስምዎትን እንዲሁም ሌሎችን መረጃዎችን ወደ ድህረ ገፁ ሲልኩ አማርኛ ብቻ ይጠቀሙ፤ በተጨማሪም ትክክለኛውን ፊደል ይጠቀሙ፤ ለምሳሌ 'ዐበበ' እና 'አበበ' ውጤታቸው የተለያየ ይሆናል፡፡
+                </p>
+            </div><label for="{{ form.your_name.id_for_label }}" class="my-label-class">{{ form.your_name.label }}</label>
         {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-sm"  }}<br>
         <label for="{{ form.day.id_for_label }}" class="my-label-class">{{ form.day.label }}</label>
         {{ form.day|add_class:"relative mt-4 border-2 border-gray-400 rounded-sm"}}<br>
