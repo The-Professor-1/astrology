@@ -30,107 +30,107 @@ class GeneralForm(forms.Form):
     day = forms.ChoiceField(
         choices=DAY_CHOICES,
         label='የጦርነቱ ቀን፡',
-        widget=forms.Select(attrs={'placeholder': 'የጦርነቱ ቀን'})
+        widget=forms.Select(attrs={'placeholder': 'የጦርነቱን ቀን ይምረጡ'})
     )
     war_month = forms.ChoiceField(
         choices=OPTIONS,
         label='የጦርነቱ ወር፡',
-        widget=forms.Select(attrs={'placeholder': 'የጦርነቱ ወር'})
+        widget=forms.Select(attrs={'placeholder': 'የጦርነቱን ወር ይምረጡ'})
     )
     pregnancy_month = forms.ChoiceField(
         choices=OPTIONS,
         label="የተፀነሰበት ወር፡",
-        widget=forms.Select(attrs={'placeholder': 'የተፀነሰበት ወር'})
+        widget=forms.Select(attrs={'placeholder': 'የተፀነሰበትን ወር ይምረጡ'})
     )
     month = forms.ChoiceField(
         choices=OPTIONS,
         label='የታመመበት ወር፡',
-        widget=forms.Select(attrs={'placeholder': 'የታመመበት ወር'})
+        widget=forms.Select(attrs={'placeholder': 'የታመመበትን ወር ይምረጡ'})
     )
     year = forms.IntegerField(
         max_value=2017,
         label='የታመመበት አመት፡',
-        widget=forms.NumberInput(attrs={'placeholder': 'የታመመበት አመት'})
+        widget=forms.NumberInput(attrs={'placeholder': 'የታመመበትን አመት ያስገቡ'})
     )
     your_name = forms.CharField(
         max_length=50,
         label='የእርስዎ ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የእርስዎ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የእርስዎን ስም በአማርኛ ያስገቡ '})
     )
     your_mothers_name = forms.CharField(
         max_length=50,
         label="የእናትዎ ስም፡",
-        widget=forms.TextInput(attrs={'placeholder': 'የእናትዎ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የእናትዎን ስም በአማርኛ ያስገቡ'})
     )
     place_name = forms.CharField(
         max_length=50,
         label='የቦታው ስም፡፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የቦታው ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የቦታውን ስም ያስገቡ'})
     )
     husbands_name = forms.CharField(
         max_length=50,
         label='የወንዱ ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የወንዱ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የወንዱን ስም በአማርኛ ያስገቡ'})
     )
     wifes_name = forms.CharField(
         max_length=50,
         label="የሴቲቱ ስም፡",
-        widget=forms.TextInput(attrs={'placeholder': 'የሴቲቱ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የሴቲቱን ስም በአማርኛ ያስገቡ'})
     )
     your_spouse_name = forms.CharField(
         max_length=50,
         label="የባለቤትዎ ስም፡",
-        widget=forms.TextInput(attrs={'placeholder': 'የባለቤትዎ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የባለቤትዎን ስም በአማርኛ ያስገቡ'})
     )
     patient_name = forms.CharField(
         max_length=50,
         label="የበሽተኛው ስም፡",
-        widget=forms.TextInput(attrs={'placeholder': 'የበሽተኛው ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የበሽተኛውን ስም በአማርኛ ያስገቡ'})
     )
     patient_mother_name = forms.CharField(
         max_length=50,
         label="የበሽተኛው እናት ስም፡",
-        widget=forms.TextInput(attrs={'placeholder': 'የበሽተኛው እናት ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የበሽተኛውን እናት ስም ያስገቡያስገቡ'})
     )
     servant_name = forms.CharField(
         max_length=50,
         label='የሰራተኛው ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የሰራተኛው ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የሰራተኛውን ስም በአማርኛ ያስገቡ'})
     )
     wengelawi = forms.CharField(
         max_length=50,
         label='የወንጌላዊው ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የወንጌላዊው ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የወንጌላዊውን ስም ያስገቡ'})
     )
     judge_name = forms.CharField(
         max_length=50,
         label='የዳኛው ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የዳኛው ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የዳኛውን ስም በአማርኛ ያስገቡ'})
     )
     opponent_name = forms.CharField(
         max_length=50,
         label='የተሟጋች ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የተሟጋች ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የተሟጋቹን ስም በአማርኛ ያስገቡ'})
     )
     enemy_name = forms.CharField(
         max_length=50,
         label='የጠላትዎ ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የጠላትዎ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የጠላትዎን ስም በአማርኛ ያስገቡ'})
     )
     day_name = forms.CharField(
         max_length=20,
         label='የፍርዱ ቀን፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የፍርዱ ቀን'})
+        widget=forms.TextInput(attrs={'placeholder': 'የፍርዱን ቀን ያስገቡ'})
     )
     lelit = forms.CharField(
         max_length=50,
         label='የሌሊቱ ስም፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የሌሊቱ ስም'})
+        widget=forms.TextInput(attrs={'placeholder': 'የሌሊቱን ስም ያስገቡ'})
     )
     ilet = forms.CharField(
         max_length=20,
         label='የክርክሩ ቀን፡',
-        widget=forms.TextInput(attrs={'placeholder': 'የክርክሩ ቀን'})
+        widget=forms.TextInput(attrs={'placeholder': 'የክርክሩን ቀን ያስገቡ'})
     )
 
 class RegisterForm(forms.ModelForm):

@@ -1,6 +1,6 @@
 from django.contrib import admin # type: ignore
 from django.urls import path,include # type: ignore
-from .views import nameandnosender,calculate,wealth_view,calculators_list,life_luck,behavior_view,place_view,marriage_luck_view,military_prophecy,love_prophecy,legal_prophecy,marriage_length_prophecy,enemy_behavior,patient_prophecy,pregnancy_prophecy,birth_prophecy,servant_behavior
+from .viiews import nameandnosender,calculate,wealth_view,calculators_list,life_luck,behavior_view,place_view,marriage_luck_view,military_prophecy,love_prophecy,legal_prophecy,marriage_length_prophecy,enemy_behavior,patient_prophecy,pregnancy_prophecy,birth_prophecy,servant_behavior
 
 urlpatterns = [
     path('',calculate ,name='calculate'),
