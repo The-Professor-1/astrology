@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment, Reply,User,UserProfile
+from .models import Post, Comment, Reply, User, UserProfile
 from django.core.exceptions import ValidationError
 
 
@@ -7,27 +7,42 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ["text"]
+        widgets = {
+            'text': forms.Textarea(attrs={'placeholder': 'Write your post...'}),
+        }
+
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ["text"]
+        widgets = {
+            'text': forms.TextInput(attrs={'placeholder': 'Write a comment...'}),
+        }
+
 
 class ReplyForm(forms.ModelForm):
     class Meta:
         model = Reply
         fields = ["text"]
+        widgets = {
+            'text': forms.TextInput(attrs={'placeholder': 'Write a reply...'}),
+        }
+
+
 class RegisterForm(forms.ModelForm):
     confirm_password = forms.CharField(
-        widget=forms.PasswordInput,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password'}),
         label="Confirm Password"
     )
-    
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
         widgets = {
-            'password': forms.PasswordInput(),
+            'username': forms.TextInput(attrs={'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Email'}),
+            'password': forms.PasswordInput(attrs={'placeholder': 'Password'}),
         }
 
     def clean_username(self):
@@ -53,6 +68,15 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=150, label="Username")
-    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+    username = forms.CharField(
+        max_length=150,
+        label="Username",
+        widget=forms.TextInput(attrs={'placeholder': 'Username'}),
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'}),
+        label="Password"
+    )
