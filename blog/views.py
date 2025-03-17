@@ -5,42 +5,29 @@ from django.contrib.auth.mixins import LoginRequiredMixin # type: ignore
 from django.views import View # type: ignore
 from django.contrib.auth.models import User # type: ignore
 from .forms import RegisterForm
-from django.shortcuts import get_object_or_404,reverse
+from django.shortcuts import get_object_or_404,reverse,HttpResponse
 from django.contrib import messages
 from home.models import User,UserProfile,SiteStats
 from contactus.models import Message
 from calculator.models import Users,Message_After_Transaction,Allowed_Users
 # Create your views here.
 
-def login_view(request):
-    error_message = None  
-    if request.method == "POST": 
-        action = request.POST.get("action")
-        if action == 'admin_login':
-            username = request.POST.get("username")  
-            password = request.POST.get("password")  
-            user = authenticate(request, username=username, password=password)  
-            
-            if user is not None:  
-                login(request, user)  # Log in the user
-                return redirect('blog:dashboard')  # Redirect to the correct blog page
-            
-            else:
-                error_message = "Invalid credentials"  
-                messages.error(request, error_message)  # Use Django messages framework
-            
-    return render(request, 'blog/admin_login.html', {'error': error_message})
-    
-def logout_view(request):
-    if request.method == "POST":
-        logout(request)
-        return redirect('admin_login')
-    else:
-        return redirect('dashboard')
 
-# Home View
-# Using the decorator 
-@login_required
+def profile_permission_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("login")
+        
+        # Check if the user is a superuser
+        if not request.user.is_superuser:
+            return HttpResponse(
+                "<center><font color='red'><h1>you are not allowed to access this page.</h1><br><br></font></center>"
+            )
+
+        return view_func(request, *args, **kwargs)
+    
+    return _wrapped_view
+@profile_permission_required
 def home_view(request):
     messages_data = Message.objects.values().order_by('-id')
     user = User.objects.values()

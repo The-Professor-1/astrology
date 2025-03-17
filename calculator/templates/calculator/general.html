@@ -9,55 +9,58 @@
     {% if address == 'kokeb_calculator' %}
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Astrology Sign Calculator</h1>
-            
-                
-                    {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
-                    {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
-                
+            {% if error_message %}
+                <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
+        
+            {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
+            {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
+        
                     <br>
-                
-                {% if error_message %}
-                    <p class="text-red-700 mt-2">{{ error_message }}</p>
-                {% endif %}
-                
-                    <button type="submit" name="action" value="calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+             <button type="submit" name="action" value="calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
             <button type="reset" name="reset" class="relative border-2 border-gray-700 rounded-lg h-8 lg:h-10 bg-none text-gray-700 text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
             <br><br>
             <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
-                {% if user %}
-                    <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
-                    <p class="text-midnightblue-500">የእርስዎ ኮከብ "<font color="green">{{ user.sign }}</font>" ነው::</p>
-                    <br>
-                    <button formnovalidate class="bg-blue-900 p-2 text-l text-white w-60 border-2 border-blue-400 rounded-lg" type="submit" name="action" value="knowsign">ስለ ኮከብዎ ለማወቅ</button>
-                    <br>
-                {% else %}
-                    <p>result will show here.</p>
-                {% endif %}
+            {% if user %}
+                <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+                <p class="text-midnightblue-500">የእርስዎ ኮከብ "<font color="green">{{ user.sign }}</font>" ነው::</p>
+                <br>
+                <button formnovalidate class="bg-blue-900 p-2 text-l text-white w-60 border-2 border-blue-400 rounded-lg" type="submit" name="action" value="knowsign">ስለ ኮከብዎ ለማወቅ</button>
+                <br>
+            {% else %}
+                <p>result will show here.</p>
+            {% endif %}
             </div>
         </div>
     {% elif address == 'wealth_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
-            <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Wealth Luck Calculator</h1>
-            
-            {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
-            {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
-            <button type="submit" name="action" value="wealth_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
-            <button type="reset" name="reset" class="relative border-2 border-gray-700 rounded-lg h-8 lg:h-10 bg-none text-gray-700 text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
-            <br><br>
-            <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
-                {% if result %}
-                    <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
-                    <p class="text-midnightblue-500">{{ result }}</p>
-                    <br>
-                {% else %}
-                    <p>result will show here.</p>
-                {% endif %}
-            </div>
+        <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Wealth Luck Calculator</h1>
+        {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+        {% endif %}
+        {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
+        {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
+        <button type="submit" name="action" value="wealth_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
+        <button type="reset" name="reset" class="relative border-2 border-gray-700 rounded-lg h-8 lg:h-10 bg-none text-gray-700 text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
+        <br><br>
+        <div class="bg-gray-200 border-2 border-gray-400 h-auto w-[100%] lg:w-96 p-2 rounded-lg shadow-md">
+            {% if result %}
+                <input type="hidden" name="sign" id="sign_value" value="{{ user.sign }}">
+                <p class="text-midnightblue-500">{{ result }}</p>
+                <br>
+            {% else %}
+                <p>result will show here.</p>
+            {% endif %}
+        </div>
         </div>
     {% elif address == 'behavior_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Behavior Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             <button type="submit" name="action" value="behavior_calculate" class="relative border-gray-700 rounded-lg mt-10 h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
             <button type="reset" name="reset" class="relative border-2 border-gray-700 rounded-lg h-8 lg:h-10 bg-none text-gray-700 text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
@@ -73,9 +76,12 @@
             </div>
         </div>
     {% elif address == 'marriage_luck' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Luck Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="marriage_luck_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -91,9 +97,12 @@
             </div>
         </div>
     {% elif address == 'place_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Place Luck Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.your_spouse_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.place_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
@@ -111,9 +120,12 @@
             </div>
         </div>
     {% elif address == 'servant_behavior' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Servant Behavior Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.servant_name|add_class:"mt-4 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="servant_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -129,9 +141,12 @@
             </div>
         </div>
     {% elif address == 'legal_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Legal Case Calculator</h1>
-          
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.judge_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.opponent_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
@@ -148,9 +163,12 @@
             </div>
         </div>
     {% elif address == 'marriage_length' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Marriage Length Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="marriage_time_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -166,9 +184,12 @@
             </div>
         </div>
     {% elif address == 'life_luck_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Life Luck Calculator</h1>
-           
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.your_mothers_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="life_luck_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -184,9 +205,12 @@
             </div>
         </div>
     {% elif address == 'enemy_behavior_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Enemy Behavior Calculator</h1>
-           
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.enemy_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="enemy_behavior_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
             <button type="reset" name="reset" class="relative border-2 border-gray-700 rounded-lg h-8 lg:h-10 bg-none text-gray-700 text-lg lg:text-2xl w-[30%] lg:w-20">clear</button>
@@ -201,9 +225,12 @@
             </div>
         </div>
     {% elif address == 'born_prophecy_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Child Birth Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             <label for="{{ form.pregnancy_month.id_for_label }}" class="my-label-class">{{ form.pregnancy_month.label }}</label>
@@ -221,9 +248,12 @@
             </div>
         </div>
     {% elif address == 'pregnancy_prophecy_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Pregnancy Prophecy Calculator</h1>
-           
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="pregnancy_prophecy_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -239,9 +269,12 @@
             </div>
         </div>
     {% elif address == 'patient_prophecy_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Patient Prophecy Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.patient_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.patient_mother_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.year|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
@@ -260,9 +293,12 @@
             </div>
         </div>
     {% elif address == 'love_prophecy_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">Love Prophecy Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.husbands_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             {{ form.wifes_name|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10 w-[70%]" }}<br><br>
             <button type="submit" name="action" value="love_prophecy_calculate" class="relative border-gray-700 rounded-lg h-8 lg:h-10 bg-gray-700 text-white text-lg lg:text-2xl w-[60%] lg:w-52">calculate</button>
@@ -278,9 +314,12 @@
             </div>
         </div>
     {% elif address == 'military_prophecy_calculator' %}
+        
         <div class="text-black bg-white h-auto w-[80%] lg:w-1/2 mt-20 border-2 shadow-md border-white rounded-lg p-4">
             <h1 class="text-2xl font-semibold text-white text-center bg-gray-800 p-3 rounded-md">War Prophecy Calculator</h1>
-            
+            {% if error_message %}
+            <p class="text-red-700 mt-2">{{ error_message }}</p>
+            {% endif %}
             {{ form.your_name|add_class:"mt-10 border-2 relative border-gray-400 rounded-lg h-10 w-[70%]" }}<br>
             <label for="{{ form.day.id_for_label }}" class="my-label-class">{{ form.day.label }}</label>
             {{ form.day|add_class:"relative mt-4 border-2 border-gray-400 rounded-lg h-10" }}<br>

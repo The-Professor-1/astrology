@@ -20,14 +20,25 @@ MARRIAGE_MODULUS = 8
 
 def profile_permission_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
-        user = request.user
-        try:
-            profile = get_object_or_404(UserProfile, user=user)
-        except UserProfile.DoesNotExist:
-            return HttpResponse("<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</font></h2></a></center>")
-        if profile.status != 'allowed':
-            return HttpResponse("<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</h2></font></a></center>")
+        if not request.user.is_authenticated:
+            return redirect("login")
+        
+        # Use session status, which is kept up-to-date by middleware
+        status = request.session.get('status', None)
+        if status is None:
+            # Fallback to database if session doesn't have it yet
+            profile = get_object_or_404(UserProfile, user=request.user)
+            status = profile.status
+            request.session['status'] = status
+        
+        if status != 'allowed':
+            return HttpResponse(
+                "<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"
+                f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</h2></font></a></center>"
+            )
+        
         return view_func(request, *args, **kwargs)
+    
     return _wrapped_view
 
 def nameandnosender(request):
@@ -35,12 +46,17 @@ def nameandnosender(request):
         if not request.user.is_authenticated:
             return redirect("login")
         action = request.POST.get('action')
+        
         if action == 'send_nameandnumber':
             name = request.POST.get('username')
             if name == 'professor':
-                return HttpResponse(f"<center><h1><font color='blue'>እርስዎ የድርጅቱ ባለቤት ስልሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም፡፡</font></h1><br>"f"<font color='blue'><h2><a href='{reverse('calculator_list')}'>ወደ ዋናው ገፅ ለመመለስ</a></h2></font></center>")
+                return HttpResponse(
+                    f"<center><h1><font color='blue'>እርስዎ የድርጅቱ ባለቤት ስልሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም፡፡</font></h1><br>"
+                    f"<font color='blue'><h2><a href='{reverse('calculator_list')}'>ወደ ዋናው ገፅ ለመመለስ</a></h2></font></center>"
+                )
             number = request.POST.get('transaction_number')
-            status = UserProfile.objects.get(user=request.user).status
+            profile = UserProfile.objects.get(user=request.user)
+            status = profile.status
             trno = TransactionNumber.objects.filter(transaction_number=number)
             if (len(trno) == 0) and (status == 'denied'):
                 try:
@@ -48,39 +64,76 @@ def nameandnosender(request):
                     trno.save()
                     item = Message_After_Transaction(username=name, transaction_number=number, status=status)
                     item.save()
-                    return HttpResponse(f"<center><font color='green'><h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1><br><br></font>"f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>")
+                    return HttpResponse(
+                        f"<center><font color='green'><h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1><br><br></font>"
+                        f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
+                    )
                 except Exception as e:
                     messages.error(request, f"An error occurred: {str(e)}")
                     return HttpResponse(f'<h1>ስህተት አለ፡ {str(e)}</h1>')
             else:
-                return HttpResponse(f"<center><font color='red'><h1>የመረጃ ስህተት አለ፡፡ እንደገና ይሞክሩ፡፡</h1><br><br></font>"f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>")
+                return HttpResponse(
+                    f"<center><font color='red'><h1>የመረጃ ስህተት አለ፡፡ እንደገና ይሞክሩ፡፡</h1><br><br></font>"
+                    f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
+                )
     return HttpResponse('<h1>Invalid request</h1>')
 
 # Updated calculate_sum with type checking
 def calculate_sum(name, modulus, fidel_pairs):
     total_sum = 0
-    valid_keys = set().union(*fidel_pairs.keys())  # Flatten all keys into a set
+    # Ensure fidel_pairs is a dict and flatten keys if necessary
+    if not isinstance(fidel_pairs, dict):
+        raise ValueError("fidel_pairs must be a dictionary")
+    
+    valid_keys = set().union(*[k if isinstance(k, (tuple, list, set)) else [k] for k in fidel_pairs.keys()])
+    
+    # Debug: Print the valid keys and input for inspection
     for char in name:
         if char not in valid_keys:
-            return None, char, 'invalid_char'  # Return None for sum, the invalid char, and an error flag
+            return None, char, 'invalid_char'
         for key, value in fidel_pairs.items():
-            if char in key:
+            # Handle if key is a collection (tuple/list/set)
+            if isinstance(key, (tuple, list, set)):
+                if char in key:
+                    total_sum = (total_sum + value) % modulus
+                    break
+            elif char == key:
                 total_sum = (total_sum + value) % modulus
                 break
-    return total_sum, None, None  # Sum, no invalid char, no error
+    return total_sum, None, None
 
 # Calculator functions
 def kokeb_calculator(name, mother_name, value=KOKEB_MODULUS):
+    # Debugging: Print inputs
+    print(f"kokeb_calculator - Name: {name}, Mother Name: {mother_name}")
+    
+    # Calculate sum for name
     name_sum, invalid_char_name, error_name = calculate_sum(name, value, lb.fidel_value_pair())
+    print(f"Name result: sum={name_sum}, invalid_char={invalid_char_name}, error={error_name}")
+    
     if error_name:
         return None, invalid_char_name, 'your_name'
+    
+    # Calculate sum for mother_name
     mother_name_sum, invalid_char_mother, error_mother = calculate_sum(mother_name, value, lb.fidel_value_pair())
+    print(f"Mother Name result: sum={mother_name_sum}, invalid_char={invalid_char_mother}, error={error_mother}")
+    
     if error_mother:
         return None, invalid_char_mother, 'your_mothers_name'
+    
+    # Combine sums and get result
     total_sum = (name_sum + mother_name_sum) % value
     title_list = list(lb.kokeb_disc_pair().keys())
-    result = title_list[total_sum - 1]
-    return result, "".join(name), "".join(mother_name)
+    print(f"Total sum: {total_sum}, Title list length: {len(title_list)}")
+    
+    # Ensure total_sum is within bounds
+    if total_sum == 0 or total_sum > len(title_list):
+        total_sum = 1  # Default to first item if out of bounds (adjust as needed)
+    
+    result = title_list[total_sum - 1]  # -1 because list is 0-indexed
+    print(f"Result: {result}")
+    
+    return result, None, None  # No invalid chars, no error
 
 def place_calculator(name, spouse_name, place_name):
     name_sum, invalid_char_name, error_name = calculate_sum(name, PLACE_MODULUS, lb.fidel_value_pair())
@@ -129,7 +182,7 @@ def calculate(request):
             try:
                 result, invalid_char, invalid_field = kokeb_calculator(self_name, mother_name)
                 if invalid_char:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     item = Users.objects.filter(selfname=self_name, mothersname=mother_name).first()
                     if item:
@@ -165,7 +218,7 @@ def wealth_view(request):
             try:
                 no, invalid_char, invalid_field = wealth_calculator(self_name, mother_name)
                 if invalid_char:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.wealth_pair()[no]
             except Exception as e:
@@ -188,7 +241,7 @@ def behavior_view(request):
             try:
                 no, invalid_char, invalid_field = behavior_calculator(self_name)
                 if invalid_char:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.behavior_pair()[no]
             except Exception as e:
@@ -213,7 +266,7 @@ def place_view(request):
             try:
                 no, invalid_char, invalid_field = place_calculator(self_name, spouse_name, place_name)
                 if invalid_char:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.place_luck_pair()[no]
             except Exception as e:
@@ -237,7 +290,7 @@ def marriage_luck_view(request):
             try:
                 no, invalid_char, invalid_field = wealth_calculator(husbands_name, wifes_name)
                 if invalid_char:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.marriage_luck_pair()[no]
             except Exception as e:
@@ -288,12 +341,12 @@ def servant_behavior(request):
             try:
                 no, invalid_char_servant, error_servant = calculate_sum(servant_name, SERVANT_MODULUS, lb.fidel_value_pair())
                 if error_servant:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_servant}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'servant_name'
                 else:
                     no2, invalid_char_your, error_your = calculate_sum(your_name, SERVANT_MODULUS, lb.fidel_value_pair())
                     if error_your:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_your}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'your_name'
                     else:
                         result = lb.servant_behavior()[str((no + no2) % SERVANT_MODULUS)]
@@ -319,17 +372,17 @@ def birth_prophecy(request):
             try:
                 no, invalid_char_husband, error_husband = calculate_sum(husbands_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                 if error_husband:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_husband}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'husbands_name'
                 else:
                     no2, invalid_char_wife, error_wife = calculate_sum(wifes_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                     if error_wife:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_wife}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'wifes_name'
                     else:
                         no3, invalid_char_month, error_month = calculate_sum(pregnancy_month, MARRIAGE_MODULUS, lb.fidel_value_pair())
                         if error_month:
-                            error_message = f"የተሳሳተ ፊደል '{invalid_char_month}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                            error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                             invalid_field = 'pregnancy_month'
                         else:
                             result = lb.born_prophecy()[str((((no + no2) % MARRIAGE_MODULUS) + no3) % SERVANT_MODULUS)]
@@ -354,12 +407,12 @@ def love_prophecy(request):
             try:
                 no, invalid_char_husband, error_husband = calculate_sum(husbands_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                 if error_husband:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_husband}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'husbands_name'
                 else:
                     no2, invalid_char_wife, error_wife = calculate_sum(wifes_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                     if error_wife:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_wife}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.love_prophecy()[str((no + no2) % MARRIAGE_MODULUS)]
@@ -384,12 +437,12 @@ def pregnancy_prophecy(request):
             try:
                 no, invalid_char_husband, error_husband = calculate_sum(husbands_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                 if error_husband:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_husband}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'husbands_name'
                 else:
                     no2, invalid_char_wife, error_wife = calculate_sum(wifes_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                     if error_wife:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_wife}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.pregnancy_prophecy()[str((no + no2) % MARRIAGE_MODULUS)]
@@ -415,17 +468,17 @@ def military_prophecy(request):
             try:
                 no, invalid_char_name, error_name = calculate_sum(your_name, WEALTH_MODULUS, lb.fidel_value_pair())
                 if error_name:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_name}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'your_name'
                 else:
                     no2, invalid_char_day, error_day = calculate_sum(war_day, WEALTH_MODULUS, lb.fidel_value_pair())
                     if error_day:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_day}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'day'
                     else:
                         no3, invalid_char_month, error_month = calculate_sum(war_month, WEALTH_MODULUS, lb.fidel_value_pair())
                         if error_month:
-                            error_message = f"የተሳሳተ ፊደል '{invalid_char_month}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                            error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                             invalid_field = 'war_month'
                         else:
                             result = lb.military_prophecy()[str((((no + no2) % WEALTH_MODULUS) + no3) % WEALTH_MODULUS)]
@@ -450,12 +503,12 @@ def life_luck(request):
             try:
                 no, invalid_char_name, error_name = calculate_sum(your_name, BEHAVIOR_MODULUS, lb.fidel_value_pair())
                 if error_name:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_name}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'your_name'
                 else:
                     no2, invalid_char_mother, error_mother = calculate_sum(your_mothers_name, BEHAVIOR_MODULUS, lb.fidel_value_pair())
                     if error_mother:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_mother}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'your_mothers_name'
                     else:
                         result = lb.life_luck_prophecy()[str((no + no2) % BEHAVIOR_MODULUS)]
@@ -482,17 +535,17 @@ def patient_prophecy(request):
             try:
                 no, invalid_char_name, error_name = calculate_sum(patient_name, PLACE_MODULUS, lb.fidel_value_pair())
                 if error_name:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_name}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'patient_name'
                 else:
                     no2, invalid_char_mother, error_mother = calculate_sum(patient_mother_name, PLACE_MODULUS, lb.fidel_value_pair())
                     if error_mother:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_mother}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'patient_mother_name'
                     else:
                         no3, invalid_char_month, error_month = calculate_sum(patient_month, PLACE_MODULUS, lb.fidel_value_pair())
                         if error_month:
-                            error_message = f"የተሳሳተ ፊደል '{invalid_char_month}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                            error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                             invalid_field = 'month'
                         else:
                             patient_year = patient_year % PLACE_MODULUS
@@ -519,17 +572,17 @@ def legal_prophecy(request):
             try:
                 no, invalid_char_judge, error_judge = calculate_sum(judge_name, SERVANT_MODULUS, lb.fidel_value_pair())
                 if error_judge:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_judge}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'judge_name'
                 else:
                     no2, invalid_char_your, error_your = calculate_sum(your_name, SERVANT_MODULUS, lb.fidel_value_pair())
                     if error_your:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_your}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'your_name'
                     else:
                         no3, invalid_char_opponent, error_opponent = calculate_sum(opponent_name, SERVANT_MODULUS, lb.fidel_value_pair())
                         if error_opponent:
-                            error_message = f"የተሳሳተ ፊደል '{invalid_char_opponent}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                            error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                             invalid_field = 'opponent_name'
                         else:
                             result = lb.legal_case_prophecy()[str((((no + no2) % SERVANT_MODULUS) + no3) % SERVANT_MODULUS)]
@@ -553,7 +606,7 @@ def enemy_behavior(request):
             try:
                 no, invalid_char_name, error_name = calculate_sum(enemy_name, BEHAVIOR_MODULUS, lb.fidel_value_pair())
                 if error_name:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_name}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'enemy_name'
                 else:
                     result = lb.enemy_behavior()[str(no % BEHAVIOR_MODULUS)]
@@ -578,12 +631,12 @@ def marriage_length_prophecy(request):
             try:
                 no, invalid_char_husband, error_husband = calculate_sum(husbands_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                 if error_husband:
-                    error_message = f"የተሳሳተ ፊደል '{invalid_char_husband}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                    error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                     invalid_field = 'husbands_name'
                 else:
                     no2, invalid_char_wife, error_wife = calculate_sum(wifes_name, MARRIAGE_MODULUS, lb.fidel_value_pair())
                     if error_wife:
-                        error_message = f"የተሳሳተ ፊደል '{invalid_char_wife}' ገብቷል፡፡ እባክዎ ትክክለኛ ፊደል ይጠቀሙ፡፡"
+                        error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.marriage_time()[str((no + no2) % MARRIAGE_MODULUS)]

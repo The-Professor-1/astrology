@@ -8,13 +8,13 @@
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.png' %}">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Dashboard</title>
-    
 </head>
 <body class="bg-gray-100 text-gray-900">
     <div class="max-w-6xl mx-auto">
         <div class="bg-white shadow-lg flex pt-16 rounded-lg p-6 mb-6">
-                <a href="{% url 'home' %}"><div class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Back to Home</div></a> 
-        </div><form method="post">
+            <a href="{% url 'home' %}"><div class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Back to Home</div></a> 
+        </div>
+        <form method="post">
             {% csrf_token %}
             <div class="text-3xl font-bold">Visits</div>
             <div class="flex flex-wrap justify-center gap-6 p-10">
@@ -30,142 +30,192 @@
                     {{noofregistered}}<br><br>Registered Users</div>
             </div>
         
-        <div class="text-3xl mt-10 font-bold mb-4">Name and Transaction Number Messages</div>
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            {% if userinfo %}
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-300 p-3 text-left">User Name</th>
-                            <th class="border border-gray-300 p-3 text-left">Transaction Number</th>
-                            <th class="border border-gray-300 p-3 text-center">Status</th>
-                            <th class="border border-gray-300 p-3 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in userinfo %}
-                            <tr class="border border-gray-300">
-                                <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.transaction_number }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.status }}</td>
-                                <td class="border border-gray-300 p-3 flex gap-2 justify-center">
-                                    <button name="give_permission_button" value="{{i.username}}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Approve</button>
-                                </td>
+            <div class="text-3xl mt-10 font-bold mb-4">Name and Transaction Number Messages</div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                {% if userinfo %}
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-3 text-left">User Name</th>
+                                <th class="border border-gray-300 p-3 text-left">Transaction Number</th>
+                                <th class="border border-gray-300 p-3 text-center">Status</th>
+                                <th class="border border-gray-300 p-3 text-center">Actions</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-gray-500">You have no messages.</p>
-            {% endif %}
-        </div>
-    <br>
-    <div class="text-3xl font-bold mb-4">Access Allowed Users</div>
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            {% if allowed %}
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-300 p-3 text-left">User Name</th>
-                            <th class="border border-gray-300 p-3 text-center">Status</th>
-                            <th class="border border-gray-300 p-3 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in allowed %}
-                            <tr class="border border-gray-300">
-                                <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.profile.status }}</td>
-                                <td class="border border-gray-300 p-3 flex gap-2 justify-center">
-                                    <button name="remove_permission_button" value="{{i.username}}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-green-700">Deny</button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-gray-500">There is no allowed users.</p>
-            {% endif %}
-        </div>
-    <br>
-        <div class="text-3xl font-bold mb-4">Messages</div>
-        <div class="bg-white shadow-lg rounded-lg p-6">
-            {% if messages %}
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <th class="border border-gray-300 p-3 text-left">Name</th>
-                            <th class="border border-gray-300 p-3 text-left">Email</th>
-                            <th class="border border-gray-300 p-3 text-left">Message</th>
-                            <th class="border border-gray-300 p-3 text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for i in messages %}
-                            <tr class="border border-gray-300">
-                                <td class="border border-gray-300 p-3">{{ i.name }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.email }}</td>
-                                <td class="border border-gray-300 p-3">{{ i.message }}</td>
-                                <td class="border border-gray-300 p-3 flex gap-2 justify-center">
-                                    <button name="dashboard_message_reply" value="{{i.email}}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Reply</button>
-                                    <button name="dashboard_message_delete" value="{{i.id}}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p class="text-gray-500">You have no messages.</p>
-            {% endif %}
-        </div>
-    <br>
-    <div class="text-3xl font-bold mb-4">Users</div>
-<div class="bg-white shadow-lg rounded-lg p-6">
-    {% if users %}
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 p-3 text-left">Name</th>
-                    <th class="border border-gray-300 p-3 text-left">Mother Name</th>
-                    <th class="border border-gray-300 p-3 text-left">Sign</th>
-                    <th class="border border-gray-300 p-3 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for i in users %}
-                    <tr class="border border-gray-300 {% if forloop.counter > 5 %}hidden{% endif %}">
-                        <td class="border border-gray-300 p-3">{{ i.selfname }}</td>
-                        <td class="border border-gray-300 p-3">{{ i.mothersname }}</td>
-                        <td class="border border-gray-300 p-3">{{ i.sign }}</td>
-                        <td class="border border-gray-300 p-3 flex gap-2 justify-center">
-                            <button name="dashboard-user-delete" value="{{ i.id }}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        {% if users|length > 5 %}
-            <div class="flex justify-end mt-4">
-                <button id="showMoreBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Show More</button>
+                        </thead>
+                        <tbody>
+                            {% for i in userinfo %}
+                                <tr class="border border-gray-300">
+                                    <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.transaction_number }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.status }}</td>
+                                    <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                                        <button name="give_permission_button" value="{{i.username}}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">Approve</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="text-gray-500">You have no messages.</p>
+                {% endif %}
             </div>
-        {% endif %}
-    {% else %}
-        <p class="text-gray-500">You have no users.</p>
-    {% endif %}
-</div>
-</form>
+            <br>
+            <div class="text-3xl font-bold mb-4">Access Allowed Users</div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                {% if allowed %}
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-3 text-left">User Name</th>
+                                <th class="border border-gray-300 p-3 text-center">Status</th>
+                                <th class="border border-gray-300 p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in allowed %}
+                                <tr {% if forloop.counter0 >= 5 %}class="hidden border border-gray-300"{% endif %}>
+                                    <td id="myData" class="border border-gray-300 p-3">{{ i.username }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.profile.status }}</td>
+                                    <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                                        <button name="remove_permission_button" value="{{i.username}}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-green-700">Deny</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if allowed|length > 5 %}
+                        <div class="flex justify-end mt-4">
+                            <button type="button" class="toggleRowsBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" data-table="allowed">Show More</button>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-gray-500">There is no allowed users.</p>
+                {% endif %}
+            </div>
+            <br>
+            <div class="text-3xl font-bold mb-4">Messages</div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                {% if messages %}
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-3 text-left">Name</th>
+                                <th class="border border-gray-300 p-3 text-left">Email</th>
+                                <th class="border border-gray-300 p-3 text-left">Message</th>
+                                <th class="border border-gray-300 p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in messages %}
+                                <tr {% if forloop.counter0 >= 5 %}class="hidden border border-gray-300"{% endif %}>
+                                    <td class="border border-gray-300 p-3">{{ i.name }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.email }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.message }}</td>
+                                    <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                                        <button name="dashboard_message_reply" value="{{i.email}}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Reply</button>
+                                        <button name="dashboard_message_delete" value="{{i.id}}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if messages|length > 5 %}
+                        <div class="flex justify-end mt-4">
+                            <button type="button" class="toggleRowsBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" data-table="messages">Show More</button>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-gray-500">You have no messages.</p>
+                {% endif %}
+            </div>
+            <br>
+            <div class="text-3xl font-bold mb-4">Users</div>
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                {% if users %}
+                    <table class="w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-3 text-left">Name</th>
+                                <th class="border border-gray-300 p-3 text-left">Mother Name</th>
+                                <th class="border border-gray-300 p-3 text-left">Sign</th>
+                                <th class="border border-gray-300 p-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in users %}
+                                <tr {% if forloop.counter0 >= 5 %}class="hidden border border-gray-300"{% endif %}>
+                                    <td class="border border-gray-300 p-3">{{ i.selfname }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.mothersname }}</td>
+                                    <td class="border border-gray-300 p-3">{{ i.sign }}</td>
+                                    <td class="border border-gray-300 p-3 flex gap-2 justify-center">
+                                        <button name="dashboard-user-delete" value="{{ i.id }}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if users|length > 5 %}
+                        <div class="flex justify-end mt-4">
+                            <button type="button" class="toggleRowsBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" data-table="users">Show More</button>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-gray-500">You have no users.</p>
+                {% endif %}
+            </div>
+        </form>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const showMoreBtn = document.getElementById("showMoreBtn");
-        if (showMoreBtn) {
-            showMoreBtn.addEventListener("click", function () {
-                document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
-                showMoreBtn.style.display = "none"; // Hide button after showing all rows
+        <style>
+            .hidden {
+                display: none;
+            }
+        </style>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const toggleButtons = document.querySelectorAll(".toggleRowsBtn");
+
+                toggleButtons.forEach(button => {
+                    const tableType = button.getAttribute("data-table");
+                    const table = button.closest('.bg-white').querySelector('table');
+                    const rows = table.querySelectorAll("tbody tr");
+                    let isExpanded = false;
+
+                    if (rows.length <= 5) {
+                        button.style.display = "none";
+                    } else {
+                        // Initially hide rows beyond 5th
+                        rows.forEach((row, index) => {
+                            if (index >= 5) {
+                                row.classList.add("hidden");
+                            }
+                        });
+                    }
+
+                    button.addEventListener("click", function (event) {
+                        event.preventDefault();
+
+                        if (!isExpanded) {
+                            rows.forEach(row => row.classList.remove("hidden"));
+                            button.textContent = "Show Less";
+                            button.classList.remove("bg-blue-600", "hover:bg-blue-700");
+                            button.classList.add("bg-red-600", "hover:bg-red-700");
+                            isExpanded = true;
+                        } else {
+                            rows.forEach((row, index) => {
+                                if (index >= 5) {
+                                    row.classList.add("hidden");
+                                }
+                            });
+                            button.textContent = "Show More";
+                            button.classList.remove("bg-red-600", "hover:bg-red-700");
+                            button.classList.add("bg-blue-600", "hover:bg-blue-700");
+                            isExpanded = false;
+                        }
+                    });
+                });
             });
-        }
-    });
-</script>
+        </script>
+    </div>
 </body>
 </html>
