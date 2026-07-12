@@ -47,7 +47,11 @@ def nameandnosender(request):
     if request.method != 'POST':
         return redirect('calculator_list')
 
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    wants_json = (
+        request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        or 'application/json' in request.headers.get('Accept', '')
+        or request.POST.get('ajax') == '1'
+    )
 
     def ajax_response(success, message, status=200, **extra):
         payload = {'success': success, 'message': message, **extra}
@@ -56,19 +60,22 @@ def nameandnosender(request):
     try:
         if not request.user.is_authenticated:
             msg = 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።'
-            if is_ajax:
+            if wants_json:
                 return ajax_response(False, msg, status=401)
             messages.error(request, msg)
             return redirect('login')
 
         action = request.POST.get('action')
         if action != 'send_nameandnumber':
+            msg = 'Invalid payment form submission.'
+            if wants_json:
+                return ajax_response(False, msg, status=400)
             return redirect('calculator_list')
 
         username = request.user.username
         if username == 'professor':
             msg = 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።'
-            if is_ajax:
+            if wants_json:
                 return ajax_response(True, msg)
             messages.info(request, msg)
             return redirect('calculator_list')
@@ -76,7 +83,7 @@ def nameandnosender(request):
         receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
         if not receipt_text:
             msg = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።'
-            if is_ajax:
+            if wants_json:
                 return ajax_response(False, msg)
             messages.error(request, msg)
             return redirect(reverse('calculator_list') + '#unlock')
@@ -87,7 +94,7 @@ def nameandnosender(request):
         )
         if profile.status == 'allowed':
             msg = 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።'
-            if is_ajax:
+            if wants_json:
                 return ajax_response(True, msg)
             messages.info(request, msg)
             return redirect('calculator_list')
@@ -105,7 +112,7 @@ def nameandnosender(request):
                     result['message']
                     + '\n\n(DB not updated — run migrations on Neon. See scripts/migrate_neon.ps1)'
                 )
-            if is_ajax:
+            if wants_json:
                 return ajax_response(False, extra.get('message', result['message']), **extra)
             messages.error(request, result['message'])
             return redirect(reverse('calculator_list') + '#unlock')
@@ -123,7 +130,7 @@ def nameandnosender(request):
             status='allowed',
         )
 
-        if is_ajax:
+        if wants_json:
             return ajax_response(True, result['message'], request_id=result.get('request_id'))
         messages.success(request, result['message'])
         return redirect('calculator_list')
@@ -132,7 +139,7 @@ def nameandnosender(request):
         import logging
         logging.getLogger(__name__).exception('Payment verification error: %s', exc)
         msg = f'የማረጋገጫ ስህተት፡ {exc}'
-        if is_ajax:
+        if wants_json:
             return ajax_response(False, msg, status=500, failure_reason=str(exc))
         messages.error(request, msg)
         return redirect(reverse('calculator_list') + '#unlock')
