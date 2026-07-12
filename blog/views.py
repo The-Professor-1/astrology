@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404,reverse,HttpResponse
 from django.contrib import messages
 from home.models import User,UserProfile,SiteStats
 from contactus.models import Message
-from calculator.models import Users,Message_After_Transaction,Allowed_Users
+from calculator.models import CalculationRecord, Message_After_Transaction, Allowed_Users
 # Create your views here.
 
 
@@ -30,23 +30,20 @@ def profile_permission_required(view_func):
 @profile_permission_required
 def home_view(request):
     messages_data = Message.objects.values().order_by('-id')
-    user = User.objects.values()
-    users = Users.objects.values()
+    calculation_records = CalculationRecord.objects.select_related('user').all()
     userinfo = Message_After_Transaction.objects.values()
     allowed = User.objects.filter(profile__status='allowed')
     if request.method == 'POST':
-        # Handle user deletion
-        if 'dashboard-user-delete' in request.POST:
-            user_id = request.POST.get('dashboard-user-delete', '')
-            if user_id:
+        if 'dashboard-calculation-delete' in request.POST:
+            record_id = request.POST.get('dashboard-calculation-delete', '')
+            if record_id:
                 try:
-                    user = get_object_or_404(Users, id=int(user_id))  # Ensure the user exists
-                    user.delete()
-                    messages.success(request, "User deleted successfully!")
+                    record = get_object_or_404(CalculationRecord, id=int(record_id))
+                    record.delete()
+                    messages.success(request, "Calculation record deleted successfully!")
                 except Exception as e:
-                    messages.error(request, f"An error occurred while deleting the user: {str(e)}")
-
-            users = Users.objects.values()  # Refresh the user list after deletion
+                    messages.error(request, f"An error occurred while deleting the record: {str(e)}")
+            calculation_records = CalculationRecord.objects.select_related('user').all()
 
         # Handle permission update
         if 'give_permission_button' in request.POST:
@@ -112,8 +109,8 @@ def home_view(request):
         "noofallowed": noofallowed,
         "noofregistered": noofregistered,
         'messages': messages_data,
-        'users': users,
-        'userinfo':userinfo,
+        'calculation_records': calculation_records,
+        'userinfo': userinfo,
         'allowed': allowed,
     }
     return render(request, 'blog/blog.html',context)

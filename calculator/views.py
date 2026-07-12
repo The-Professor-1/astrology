@@ -5,8 +5,9 @@ from django.urls import reverse  # type:ignore
 from django.conf import settings  # type:ignore
 from calculator import library as lb
 from calculator.payment import verify_and_process_payment
+from calculator.records import record_calculation, kokeb_result
 from .forms import RegisterForm, GeneralForm
-from .models import Users, Message_After_Transaction
+from .models import Message_After_Transaction
 from home.models import User, UserProfile, TransactionNumber, SiteStats
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -215,18 +216,16 @@ def calculate(request):
                 if invalid_char:
                     error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
-                    item = Users.objects.filter(selfname=self_name, mothersname=mother_name).first()
-                    if item:
-                        user = item
-                    else:
-                        description = lb.kokeb_disc_pair().get(result, 'Default Description')
-                        user = Users(selfname="".join(self_name), mothersname="".join(mother_name), sign=result, description=description)
-                        user.save()
+                    user = kokeb_result(result)
+                    record_calculation(request, 'kokeb_calculator', {
+                        'your_name': self_name,
+                        'your_mothers_name': mother_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"An error occurred: {str(e)}")
         elif action == 'knowsign':
             title = request.POST.get('sign')
-            description = Users.objects.filter(sign=title).values_list('description', flat=True).first()
+            description = lb.kokeb_disc_pair().get(title, '')
             context = {'sign': title, 'description': description}
             return render(request, 'calculator/description.html', context)
     return render(request, 'calculator/general.html', {
@@ -252,6 +251,10 @@ def wealth_view(request):
                     error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.wealth_pair()[no]
+                    record_calculation(request, 'wealth_calculator', {
+                        'your_name': self_name,
+                        'your_mothers_name': mother_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating wealth: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -275,6 +278,9 @@ def behavior_view(request):
                     error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.behavior_pair()[no]
+                    record_calculation(request, 'behavior_calculator', {
+                        'your_name': self_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -300,6 +306,11 @@ def place_view(request):
                     error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.place_luck_pair()[no]
+                    record_calculation(request, 'place_calculator', {
+                        'your_name': self_name,
+                        'your_spouse_name': spouse_name,
+                        'place_name': place_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating place luck: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -324,6 +335,10 @@ def marriage_luck_view(request):
                     error_message = f"የተሳሳተ ፊደል አስገብተዋል፡፡ እባክዎ በአማርኛ ብቻ ያስገቡ፡፡"
                 else:
                     result = lb.marriage_luck_pair()[no]
+                    record_calculation(request, 'marriage_luck', {
+                        'husbands_name': husbands_name,
+                        'wifes_name': wifes_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating marriage luck: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -387,6 +402,10 @@ def servant_behavior(request):
                         invalid_field = 'your_name'
                     else:
                         result = lb.servant_behavior()[str((no + no2) % SERVANT_MODULUS)]
+                        record_calculation(request, 'servant_behavior', {
+                            'your_name': your_name,
+                            'servant_name': servant_name,
+                        }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -423,6 +442,11 @@ def birth_prophecy(request):
                             invalid_field = 'pregnancy_month'
                         else:
                             result = lb.born_prophecy()[str((((no + no2) % MARRIAGE_MODULUS) + no3) % SERVANT_MODULUS)]
+                            record_calculation(request, 'born_prophecy_calculator', {
+                                'husbands_name': husbands_name,
+                                'wifes_name': wifes_name,
+                                'pregnancy_month': pregnancy_month,
+                            }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -453,6 +477,10 @@ def love_prophecy(request):
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.love_prophecy()[str((no + no2) % MARRIAGE_MODULUS)]
+                        record_calculation(request, 'love_prophecy_calculator', {
+                            'husbands_name': husbands_name,
+                            'wifes_name': wifes_name,
+                        }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -483,6 +511,10 @@ def pregnancy_prophecy(request):
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.pregnancy_prophecy()[str((no + no2) % MARRIAGE_MODULUS)]
+                        record_calculation(request, 'pregnancy_prophecy_calculator', {
+                            'husbands_name': husbands_name,
+                            'wifes_name': wifes_name,
+                        }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -519,6 +551,11 @@ def military_prophecy(request):
                             invalid_field = 'war_month'
                         else:
                             result = lb.military_prophecy()[str((((no + no2) % WEALTH_MODULUS) + no3) % WEALTH_MODULUS)]
+                            record_calculation(request, 'military_prophecy_calculator', {
+                                'your_name': your_name,
+                                'day': war_day,
+                                'war_month': war_month,
+                            }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -549,6 +586,10 @@ def life_luck(request):
                         invalid_field = 'your_mothers_name'
                     else:
                         result = lb.life_luck_prophecy()[str((no + no2) % BEHAVIOR_MODULUS)]
+                        record_calculation(request, 'life_luck_calculator', {
+                            'your_name': your_name,
+                            'your_mothers_name': your_mothers_name,
+                        }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -587,6 +628,12 @@ def patient_prophecy(request):
                         else:
                             patient_year = patient_year % PLACE_MODULUS
                             result = lb.patient_prophecy()[str((((((no + no2) % PLACE_MODULUS) + no3) % PLACE_MODULUS) + patient_year) % PLACE_MODULUS)]
+                            record_calculation(request, 'patient_prophecy_calculator', {
+                                'patient_name': patient_name,
+                                'patient_mother_name': patient_mother_name,
+                                'month': patient_month,
+                                'year': request.POST.get('year'),
+                            }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -623,6 +670,11 @@ def legal_prophecy(request):
                             invalid_field = 'opponent_name'
                         else:
                             result = lb.legal_case_prophecy()[str((((no + no2) % SERVANT_MODULUS) + no3) % SERVANT_MODULUS)]
+                            record_calculation(request, 'legal_calculator', {
+                                'judge_name': judge_name,
+                                'your_name': your_name,
+                                'opponent_name': opponent_name,
+                            }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -647,6 +699,9 @@ def enemy_behavior(request):
                     invalid_field = 'enemy_name'
                 else:
                     result = lb.enemy_behavior()[str(no % BEHAVIOR_MODULUS)]
+                    record_calculation(request, 'enemy_behavior_calculator', {
+                        'enemy_name': enemy_name,
+                    }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {
@@ -677,6 +732,10 @@ def marriage_length_prophecy(request):
                         invalid_field = 'wifes_name'
                     else:
                         result = lb.marriage_time()[str((no + no2) % MARRIAGE_MODULUS)]
+                        record_calculation(request, 'marriage_length', {
+                            'husbands_name': husbands_name,
+                            'wifes_name': wifes_name,
+                        }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
     return render(request, 'calculator/general.html', {

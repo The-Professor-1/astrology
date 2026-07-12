@@ -129,38 +129,43 @@
                 {% endif %}
             </div>
             <br>
-            <div class="text-3xl font-bold mb-4">Users</div>
+            <div class="text-3xl font-bold mb-4">Account Calculations</div>
+            <p class="text-gray-600 mb-4 text-sm">Logged-in users only — all calculator types (ኮከብ, ሀብት, ትንቢት, etc.)</p>
             <div class="bg-white shadow-lg rounded-lg p-6">
-                {% if users %}
+                {% if calculation_records %}
                     <table class="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-200">
-                                <th class="border border-gray-300 p-3 text-left">Name</th>
-                                <th class="border border-gray-300 p-3 text-left">Mother Name</th>
-                                <th class="border border-gray-300 p-3 text-left">Sign</th>
+                                <th class="border border-gray-300 p-3 text-left">Account</th>
+                                <th class="border border-gray-300 p-3 text-left">Calculator</th>
+                                <th class="border border-gray-300 p-3 text-left">Inputs</th>
+                                <th class="border border-gray-300 p-3 text-left">Result</th>
+                                <th class="border border-gray-300 p-3 text-left">Date</th>
                                 <th class="border border-gray-300 p-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in users %}
+                            {% for record in calculation_records %}
                                 <tr {% if forloop.counter0 >= 5 %}class="hidden border border-gray-300"{% endif %}>
-                                    <td class="border border-gray-300 p-3">{{ i.selfname }}</td>
-                                    <td class="border border-gray-300 p-3">{{ i.mothersname }}</td>
-                                    <td class="border border-gray-300 p-3">{{ i.sign }}</td>
+                                    <td class="border border-gray-300 p-3">{{ record.user.username }}</td>
+                                    <td class="border border-gray-300 p-3">{{ record.calculator_label }}</td>
+                                    <td class="border border-gray-300 p-3 text-sm">{{ record.inputs_display }}</td>
+                                    <td class="border border-gray-300 p-3 text-sm max-w-xs truncate" title="{{ record.result }}">{{ record.result|truncatechars:120 }}</td>
+                                    <td class="border border-gray-300 p-3 text-sm whitespace-nowrap">{{ record.created_at|date:"d M Y H:i" }}</td>
                                     <td class="border border-gray-300 p-3 flex gap-2 justify-center">
-                                        <button name="dashboard-user-delete" value="{{ i.id }}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
+                                        <button name="dashboard-calculation-delete" value="{{ record.id }}" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
                                     </td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
-                    {% if users|length > 5 %}
+                    {% if calculation_records|length > 5 %}
                         <div class="flex justify-end mt-4">
-                            <button type="button" class="toggleRowsBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" data-table="users">Show More</button>
+                            <button type="button" class="toggleRowsBtn bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" data-table="calculations">Show More</button>
                         </div>
                     {% endif %}
                 {% else %}
-                    <p class="text-gray-500">You have no users.</p>
+                    <p class="text-gray-500">No saved calculations yet. Records appear when logged-in users run any calculator.</p>
                 {% endif %}
             </div>
         </form>
