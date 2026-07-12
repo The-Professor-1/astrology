@@ -196,11 +196,11 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.disabled = true;
 
             try {
-                const formData = new FormData(paymentForm);
-                formData.set('action', 'send_nameandnumber');
-                formData.set('ajax', '1');
-                const csrfToken = getCookie('csrftoken') || formData.get('csrfmiddlewaretoken');
+                const receiptText = textarea.value.trim();
+                const csrfToken = getCookie('csrftoken')
+                    || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
                 const headers = {
+                    'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',
                 };
@@ -210,7 +210,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const response = await fetch(verifyUrl, {
                     method: 'POST',
                     headers,
-                    body: formData,
+                    body: JSON.stringify({
+                        telebirr_receipt_text: receiptText,
+                        ajax: '1',
+                    }),
                     credentials: 'same-origin',
                     redirect: 'manual',
                 });

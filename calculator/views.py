@@ -43,6 +43,24 @@ def profile_permission_required(view_func):
     
     return _wrapped_view
 
+def _post_field(request, key, default=''):
+    """Read POST field from form body or JSON body (Vercel/serverless friendly)."""
+    if key in request.POST:
+        return request.POST.get(key, default)
+    if not hasattr(request, '_json_body_cache'):
+        request._json_body_cache = {}
+        if request.content_type and 'application/json' in request.content_type:
+            try:
+                import json
+                raw = request.body.decode('utf-8') if request.body else ''
+                if raw.strip():
+                    request._json_body_cache = json.loads(raw)
+            except (ValueError, UnicodeDecodeError):
+                request._json_body_cache = {}
+    val = request._json_body_cache.get(key, default)
+    return val if val is not None else default
+
+
 def nameandnosender(request):
     if request.method != 'POST':
         return redirect('calculator_list')
@@ -50,7 +68,8 @@ def nameandnosender(request):
     wants_json = (
         request.headers.get('X-Requested-With') == 'XMLHttpRequest'
         or 'application/json' in request.headers.get('Accept', '')
-        or request.POST.get('ajax') == '1'
+        or _post_field(request, 'ajax') == '1'
+        or (request.content_type and 'application/json' in request.content_type)
     )
 
     def ajax_response(success, message, status=200, **extra):
@@ -65,13 +84,6 @@ def nameandnosender(request):
             messages.error(request, msg)
             return redirect('login')
 
-        action = request.POST.get('action')
-        if action != 'send_nameandnumber':
-            msg = 'Invalid payment form submission.'
-            if wants_json:
-                return ajax_response(False, msg, status=400)
-            return redirect('calculator_list')
-
         username = request.user.username
         if username == 'professor':
             msg = 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።'
@@ -80,7 +92,7 @@ def nameandnosender(request):
             messages.info(request, msg)
             return redirect('calculator_list')
 
-        receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
+        receipt_text = (_post_field(request, 'telebirr_receipt_text') or '').strip()
         if not receipt_text:
             msg = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።'
             if wants_json:
