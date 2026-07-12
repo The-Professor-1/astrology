@@ -49,67 +49,89 @@ def nameandnosender(request):
 
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
-    if not request.user.is_authenticated:
-        msg = 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።'
-        if is_ajax:
-            return JsonResponse({'success': False, 'message': msg}, status=401)
-        messages.error(request, msg)
-        return redirect('login')
+    def ajax_response(success, message, status=200, **extra):
+        payload = {'success': success, 'message': message, **extra}
+        return JsonResponse(payload, status=status)
 
-    action = request.POST.get('action')
-    if action != 'send_nameandnumber':
+    try:
+        if not request.user.is_authenticated:
+            msg = 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።'
+            if is_ajax:
+                return ajax_response(False, msg, status=401)
+            messages.error(request, msg)
+            return redirect('login')
+
+        action = request.POST.get('action')
+        if action != 'send_nameandnumber':
+            return redirect('calculator_list')
+
+        username = request.user.username
+        if username == 'professor':
+            msg = 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።'
+            if is_ajax:
+                return ajax_response(True, msg)
+            messages.info(request, msg)
+            return redirect('calculator_list')
+
+        receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
+        if not receipt_text:
+            msg = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።'
+            if is_ajax:
+                return ajax_response(False, msg)
+            messages.error(request, msg)
+            return redirect(reverse('calculator_list') + '#unlock')
+
+        profile, _ = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'status': 'denied'},
+        )
+        if profile.status == 'allowed':
+            msg = 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።'
+            if is_ajax:
+                return ajax_response(True, msg)
+            messages.info(request, msg)
+            return redirect('calculator_list')
+
+        used_refs = set(TransactionNumber.objects.values_list('transaction_number', flat=True))
+        result = verify_and_process_payment(receipt_text, used_refs, user=request.user)
+
+        if not result['success']:
+            if is_ajax:
+                return ajax_response(
+                    False,
+                    result['message'],
+                    failure_reason=result.get('failure_reason', ''),
+                    request_id=result.get('request_id'),
+                )
+            messages.error(request, result['message'])
+            return redirect(reverse('calculator_list') + '#unlock')
+
+        reference = result['reference']
+        TransactionNumber.objects.get_or_create(transaction_number=reference)
+        profile.status = 'allowed'
+        profile.save()
+        request.session['status'] = 'allowed'
+        request.session.modified = True
+
+        Message_After_Transaction.objects.create(
+            username=username,
+            transaction_number=reference,
+            status='allowed',
+        )
+
+        if is_ajax:
+            return ajax_response(True, result['message'], request_id=result.get('request_id'))
+        messages.success(request, result['message'])
         return redirect('calculator_list')
 
-    username = request.user.username
-    if username == 'professor':
-        msg = 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።'
+    except Exception as exc:
+        import logging
+        logging.getLogger(__name__).exception('Payment verification error: %s', exc)
+        msg = f'የማረጋገጫ ስህተት፡ {exc}'
         if is_ajax:
-            return JsonResponse({'success': True, 'message': msg})
-        messages.info(request, msg)
-        return redirect('calculator_list')
-
-    receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
-    if not receipt_text:
-        msg = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።'
-        if is_ajax:
-            return JsonResponse({'success': False, 'message': msg})
+            return ajax_response(False, msg, status=500, failure_reason=str(exc))
         messages.error(request, msg)
         return redirect(reverse('calculator_list') + '#unlock')
-
-    profile = UserProfile.objects.get(user=request.user)
-    if profile.status == 'allowed':
-        msg = 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።'
-        if is_ajax:
-            return JsonResponse({'success': True, 'message': msg})
-        messages.info(request, msg)
-        return redirect('calculator_list')
-
-    used_refs = set(TransactionNumber.objects.values_list('transaction_number', flat=True))
-    result = verify_and_process_payment(receipt_text, used_refs)
-
-    if not result['success']:
-        if is_ajax:
-            return JsonResponse({'success': False, 'message': result['message']})
-        messages.error(request, result['message'])
-        return redirect(reverse('calculator_list') + '#unlock')
-
-    reference = result['reference']
-    TransactionNumber.objects.create(transaction_number=reference)
-    profile.status = 'allowed'
-    profile.save()
-    request.session['status'] = 'allowed'
-    request.session.modified = True
-
-    Message_After_Transaction.objects.create(
-        username=username,
-        transaction_number=reference,
-        status='allowed',
-    )
-
-    if is_ajax:
-        return JsonResponse({'success': True, 'message': result['message']})
-    messages.success(request, result['message'])
-    return redirect('calculator_list')
 
 # Updated calculate_sum with type checking
 def calculate_sum(name, modulus, fidel_pairs):

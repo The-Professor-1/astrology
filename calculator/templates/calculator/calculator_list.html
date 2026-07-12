@@ -160,6 +160,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const verifySuccessMsg = document.getElementById('verify-success-message');
     const verifyErrorMsg = document.getElementById('verify-error-message');
 
+    function getCookie(name) {
+        if (!document.cookie) return null;
+        const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+        return match ? decodeURIComponent(match[1]) : null;
+    }
+
     function showVerifyState(state) {
         verifyLoading.classList.toggle('hidden', state !== 'loading');
         verifySuccess.classList.toggle('hidden', state !== 'success');
@@ -191,27 +197,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
             try {
                 const formData = new FormData(paymentForm);
+                const csrfToken = getCookie('csrftoken') || formData.get('csrfmiddlewaretoken');
+                const headers = { 'X-Requested-With': 'XMLHttpRequest' };
+                if (csrfToken) headers['X-CSRFToken'] = csrfToken;
+
                 const response = await fetch(paymentForm.action, {
                     method: 'POST',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    headers,
                     body: formData,
+                    credentials: 'same-origin',
                 });
+
+                const rawText = await response.text();
                 let data;
                 try {
-                    data = await response.json();
+                    data = JSON.parse(rawText);
                 } catch (_) {
-                    throw new Error('invalid_json');
+                    const snippet = rawText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+                    throw new Error(
+                        response.ok
+                            ? 'Server returned invalid JSON.'
+                            : `Server error (${response.status}): ${snippet || response.statusText}`
+                    );
                 }
 
                 if (data.success) {
                     verifySuccessMsg.textContent = data.message;
                     openVerifyModal('success');
                 } else {
-                    verifyErrorMsg.textContent = data.message;
+                    let msg = data.message || 'Verification failed.';
+                    if (data.failure_reason) {
+                        msg += '\n\n' + data.failure_reason;
+                    }
+                    if (data.request_id) {
+                        msg += '\n\nጥያቄዎ ተመዝግቧል — አስተዳዳሪ ይመርምራል።';
+                    }
+                    verifyErrorMsg.textContent = msg;
                     openVerifyModal('error');
                 }
             } catch (err) {
-                verifyErrorMsg.textContent = 'ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።';
+                verifyErrorMsg.textContent = err.message || 'ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።';
                 openVerifyModal('error');
             } finally {
                 btn.disabled = false;

@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from home.models import UserProfile
 
 class UpdateUserStatusMiddleware:
@@ -7,13 +6,11 @@ class UpdateUserStatusMiddleware:
 
     def __call__(self, request):
         if request.user.is_authenticated:
-            # Get the user's profile
-            profile = get_object_or_404(UserProfile, user=request.user)
-            # Check if session status matches database status
-            session_status = request.session.get('status', None)
-            if session_status != profile.status:
-                # Update session with current status
-                request.session['status'] = profile.status
-                request.session.modified = True  # Ensure session saves
+            profile = UserProfile.objects.filter(user=request.user).first()
+            if profile:
+                session_status = request.session.get('status', None)
+                if session_status != profile.status:
+                    request.session['status'] = profile.status
+                    request.session.modified = True
         response = self.get_response(request)
         return response

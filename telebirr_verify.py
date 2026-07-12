@@ -5,7 +5,7 @@ Used for automatic deposit verification when user sends full Telebirr SMS text.
 import re
 import logging
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 
@@ -19,7 +19,11 @@ logger = logging.getLogger(__name__)
 # Oromiffa example:
 # "... Gara NIGUS LIBE (2519****8708)tti  Qarshii 100.00 ... ergitanii jirtu. Lakkoofsi sochii maallaqaa keessan DD68N9FL96' dha. ... link ... receipt/DD68N9FL96 ... teelebirr ... Itiyoo telekoom"
 
-# Amount: ETB X.XX (English), Qarshii X.XX (Oromiffa), or X.XX ብር (Amharic – first match wins transfer amount)
+# Amount: prefer transfer line, then ETB / Qarshii / ብር (skip service-fee lines)
+_AMOUNT_TRANSFER_ETB_RE = re.compile(
+    r'transferred\s+ETB\s+([0-9]+(?:\.[0-9]{1,2})?)',
+    re.IGNORECASE,
+)
 _AMOUNT_ETB_RE = re.compile(r'\bETB\s+([0-9]+(?:\.[0-9]{1,2})?)\b', re.IGNORECASE)
 _AMOUNT_QARSHII_RE = re.compile(r'Qarshii\s+([0-9]+(?:\.[0-9]{1,2})?)', re.IGNORECASE)
 _AMOUNT_BIRR_RE = re.compile(r'([0-9]+(?:\.[0-9]{1,2})?)\s*ብር', re.UNICODE)
@@ -58,24 +62,41 @@ def parse_telebirr_receipt_text(text: str) -> Optional[dict]:
     if not text or not isinstance(text, str):
         return None
     text = text.strip()
-    if len(text) < 80:
+    if len(text) < 40:
         return None
 
     text_lower = text.lower()
-    text_for_amharic = text  # keep original for Amharic regexes
-    for group in _REQUIRED_MARKER_GROUPS:
-        if not any(m in text_lower or m in text_for_amharic for m in group):
-            return None
+    text_for_amharic = text
 
-    # Amount: ETB (English), Qarshii (Oromiffa), then X.XX ብር (Amharic)
+    # Soft marker check — reference + telebirr/transfer hint is enough
+    has_transfer_hint = any(
+        m in text_lower or m in text_for_amharic
+        for m in ('transferred', 'ልከዋል', 'ergitanii', 'etb', 'ብር', 'qarshii')
+    )
+    has_telebirr_hint = any(
+        m in text_lower or m in text_for_amharic
+        for m in ('telebirr', 'ቴሌብር', 'teelebirr', 'itiyoo', 'ethio telecom')
+    )
+    if not has_transfer_hint and not has_telebirr_hint:
+        return None
+
+    # Amount: transfer-specific ETB first, then Qarshii, generic ETB, Amharic birr
     amount_str = None
-    amount_match = _AMOUNT_ETB_RE.search(text)
+    amount_match = _AMOUNT_TRANSFER_ETB_RE.search(text)
     if amount_match:
         amount_str = amount_match.group(1)
     if not amount_str:
         amount_match = _AMOUNT_QARSHII_RE.search(text)
         if amount_match:
             amount_str = amount_match.group(1)
+    if not amount_str:
+        for amount_match in _AMOUNT_ETB_RE.finditer(text):
+            # Skip service-fee lines when possible
+            window = text[max(0, amount_match.start() - 40):amount_match.end() + 10].lower()
+            if 'service fee' in window or 'service charge' in window:
+                continue
+            amount_str = amount_match.group(1)
+            break
     if not amount_str:
         amount_match = _AMOUNT_BIRR_RE.search(text)
         if amount_match:
@@ -164,8 +185,9 @@ def verify_telebirr_receipt(reference: str, api_key: str) -> dict:
         logger.warning("Telebirr verify API HTTP %s for ref %s: %s", resp.status_code, reference, err)
         return {
             'success': False,
-            'data': body.get('data'),
+            'data': normalize_api_data(body.get('data')),
             'error': err,
+            'raw_body': body,
         }
 
     if not body.get('success'):
@@ -173,15 +195,35 @@ def verify_telebirr_receipt(reference: str, api_key: str) -> dict:
         logger.warning("Telebirr verify API success=false for ref %s: %s", reference, err)
         return {
             'success': False,
-            'data': body.get('data'),
+            'data': normalize_api_data(body.get('data')),
             'error': err,
+            'raw_body': body,
         }
 
     return {
         'success': True,
-        'data': body.get('data'),
+        'data': normalize_api_data(body.get('data')),
         'error': None,
+        'raw_body': body,
     }
+
+
+def normalize_api_data(data) -> dict:
+    """Flatten nested API payloads so settledAmount / creditedParty* are at top level."""
+    if not data:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+
+    merged = dict(data)
+    for key in ('receipt', 'transaction', 'data', 'result', 'payload', 'details'):
+        nested = data.get(key)
+        if isinstance(nested, dict):
+            for k, v in nested.items():
+                if k not in merged or merged[k] in (None, ''):
+                    merged[k] = v
+
+    return merged
 
 
 def normalize_credited_party_for_comparison(name: str) -> str:
@@ -332,3 +374,158 @@ def credited_party_matches(
             return False
 
     return True
+
+
+def sms_amount_matches_expected(parsed_amount: Decimal, expected: Decimal) -> bool:
+    """SMS amount may show transfer only; allow small fee delta if total debited is shown."""
+    if parsed_amount == expected:
+        return True
+    if parsed_amount > expected and parsed_amount - expected <= Decimal('10'):
+        return True
+    return False
+
+
+def transaction_status_is_failed(api_data: dict) -> bool:
+    status = str(get_api_field(api_data, 'transactionStatus', 'transaction_status') or '').lower()
+    return status in {'failed', 'cancelled', 'canceled', 'reversed', 'declined', 'rejected'}
+
+
+def extract_credited_party(api_data: dict) -> Tuple[str, str]:
+    name = str(get_api_field(
+        api_data,
+        'creditedPartyName',
+        'credited_party_name',
+        'creditedPartyAccountHolderName',
+    ) or '')
+    account = str(get_api_field(
+        api_data,
+        'creditedPartyAccountNo',
+        'creditedPartyAccountNumber',
+        'credited_party_account_no',
+    ) or '')
+    return name, account
+
+
+def validate_telebirr_deposit(
+    parsed: dict,
+    api_result: dict,
+    expected_amount: Decimal,
+    expected_holder: str,
+    expected_account: str,
+) -> dict:
+    """
+    Decide if a deposit is valid for automatic unlock.
+    Returns dict with keys: valid (bool), message (str), failure_reason (str), checks (dict).
+    Approves when API data has matching settledAmount + credited party, even if success flag is false.
+    """
+    checks = {}
+    reference = parsed.get('reference', '')
+    api_data = normalize_api_data(api_result.get('data') or {})
+    checks['api_success_flag'] = bool(api_result.get('success'))
+    checks['api_error'] = api_result.get('error')
+    checks['has_api_data'] = bool(api_data)
+
+    if transaction_status_is_failed(api_data):
+        status = get_api_field(api_data, 'transactionStatus', 'transaction_status')
+        reason = f'transaction status failed: {status}'
+        return {
+            'valid': False,
+            'message': f'የክፍያ ሁኔታ ተሳክቶ አልተጠናቀቀም ({status})።',
+            'failure_reason': reason,
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    settled = amount_from_api_settled(api_data)
+    checks['settled_amount'] = str(settled) if settled is not None else None
+    amount_ok = transfer_amount_matches_expected(api_data, expected_amount) if api_data else False
+    checks['amount_ok'] = amount_ok
+
+    credited_name, credited_account = extract_credited_party(api_data)
+    checks['credited_name'] = credited_name
+    checks['credited_account'] = credited_account
+    recipient_ok = credited_party_matches(
+        credited_name,
+        credited_account,
+        expected_holder,
+        expected_account,
+    ) if api_data else False
+    checks['recipient_ok'] = recipient_ok
+
+    sms_amount = parsed.get('amount')
+    checks['sms_amount'] = str(sms_amount) if sms_amount is not None else None
+    checks['sms_amount_ok'] = sms_amount_matches_expected(sms_amount, expected_amount) if sms_amount else False
+
+    if api_data and amount_ok and recipient_ok:
+        return {
+            'valid': True,
+            'message': 'ክፍያዎ ተረጋግጧል! አሁን ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።',
+            'failure_reason': '',
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    if not api_result.get('success') and not api_data:
+        err = api_result.get('error') or 'API verification failed'
+        return {
+            'valid': False,
+            'message': f'ክፍያው በ API አልተረጋገጠም፡ {err}',
+            'failure_reason': f'api_error: {err}',
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    if api_data and not amount_ok:
+        return {
+            'valid': False,
+            'message': (
+                f'የተላከው መጠን {expected_amount} ብር መሆን አለበት። '
+                f'API settledAmount: {settled or "unknown"}።'
+            ),
+            'failure_reason': f'amount mismatch: settled={settled}, expected={expected_amount}',
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    if api_data and not recipient_ok:
+        return {
+            'valid': False,
+            'message': (
+                'ክፍያው ወደ ትክክለኛው Telebirr አካውንት አልተላከም። '
+                f'ተቀባይ: {credited_name or "?"} ({credited_account or "?"})።'
+            ),
+            'failure_reason': (
+                f'recipient mismatch: got {credited_name}/{credited_account}, '
+                f'expected {_first_name(expected_holder)}/****{_last4_from_account(expected_account)}'
+            ),
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    if not checks['sms_amount_ok']:
+        return {
+            'valid': False,
+            'message': (
+                f'የ SMS መጠን {expected_amount} ብር መሆን አለበት። '
+                f'የተገኘው: {sms_amount} ብር።'
+            ),
+            'failure_reason': f'sms amount mismatch: {sms_amount}',
+            'checks': checks,
+            'reference': reference,
+            'api_data': api_data,
+        }
+
+    err = api_result.get('error') or 'Unknown verification failure'
+    return {
+        'valid': False,
+        'message': f'ክፍያው አልተረጋግጠም፡ {err}',
+        'failure_reason': err,
+        'checks': checks,
+        'reference': reference,
+        'api_data': api_data,
+    }
