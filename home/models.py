@@ -8,7 +8,15 @@ class SiteStats(models.Model):
     kokeb_calculator_visits = models.PositiveIntegerField(default=0)
     calculators_list_visits = models.PositiveIntegerField(default=0)
 class TransactionNumber(models.Model):
-    transaction_number = models.CharField(max_length=100)
+    transaction_number = models.CharField(max_length=100, unique=True, db_index=True)
+    used_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='claimed_transactions',
+    )
+    claimed_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 class UserProfile(models.Model):
     # One-to-one link to the default User model
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

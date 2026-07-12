@@ -16,6 +16,127 @@ from telebirr_verify import (
 logger = logging.getLogger(__name__)
 
 
+def normalize_reference(reference: str) -> str:
+    return str(reference or '').strip().upper()
+
+
+def _legacy_receipt_owner(reference: str) -> Optional[str]:
+    """Best-effort username for receipts recorded before used_by existed."""
+    from calculator.models import Message_After_Transaction
+
+    ref = normalize_reference(reference)
+    msg = (
+        Message_After_Transaction.objects
+        .filter(transaction_number__iexact=ref, status='allowed')
+        .order_by('-id')
+        .values_list('username', flat=True)
+        .first()
+    )
+    return msg or None
+
+
+def check_receipt_already_used(reference: str, current_user=None) -> dict:
+    """
+    Return whether a receipt reference was already used to unlock access.
+    Keys: blocked (bool), message (str), owner (str|None)
+    """
+    ref = normalize_reference(reference)
+    if not ref:
+        return {'blocked': False, 'message': '', 'owner': None}
+
+    approved = PaymentVerificationRequest.objects.filter(
+        parsed_reference__iexact=ref,
+        status__in=(
+            PaymentVerificationRequest.STATUS_AUTO_APPROVED,
+            PaymentVerificationRequest.STATUS_MANUAL_APPROVED,
+        ),
+    ).select_related('user').first()
+
+    if approved:
+        owner = approved.user.username
+        if current_user and approved.user_id == current_user.id:
+            return {
+                'blocked': True,
+                'message': 'አስቀድመው ይህን የክፍያ ቁጥር በመለያዎ ጥቅም ላይ አውልደዋል።',
+                'owner': owner,
+            }
+        return {
+            'blocked': True,
+            'message': f'ይህ የክፍያ ቁጥር በሌላ ተጠቃሚ ({owner}) ቀድሞውኑ ጥቅም ላይ ውሏል።',
+            'owner': owner,
+        }
+
+    from home.models import TransactionNumber
+
+    txn = TransactionNumber.objects.filter(transaction_number__iexact=ref).select_related('used_by').first()
+    if txn:
+        owner = txn.used_by.username if txn.used_by else _legacy_receipt_owner(ref)
+        if current_user and txn.used_by_id == current_user.id:
+            return {
+                'blocked': True,
+                'message': 'አስቀድመው ይህን የክፍያ ቁጥር በመለያዎ ጥቅም ላይ አውልደዋል።',
+                'owner': owner,
+            }
+        if owner:
+            return {
+                'blocked': True,
+                'message': f'ይህ የክፍያ ቁጥር በሌላ ተጠቃሚ ({owner}) ቀድሞውኑ ጥቅም ላይ ውሏል።',
+                'owner': owner,
+            }
+        return {
+            'blocked': True,
+            'message': 'ይህ የክፍያ ቁጥር ቀድሞውኑ ጥቅም ላይ ውሏል።',
+            'owner': None,
+        }
+
+    legacy_owner = _legacy_receipt_owner(ref)
+    if legacy_owner:
+        if current_user and current_user.username == legacy_owner:
+            return {
+                'blocked': True,
+                'message': 'አስቀድመው ይህን የክፍያ ቁጥር በመለያዎ ጥቅም ላይ አውልደዋል።',
+                'owner': legacy_owner,
+            }
+        return {
+            'blocked': True,
+            'message': f'ይህ የክፍያ ቁጥር በሌላ ተጠቃሚ ({legacy_owner}) ቀድሞውኑ ጥቅም ላይ ውሏል።',
+            'owner': legacy_owner,
+        }
+
+    return {'blocked': False, 'message': '', 'owner': None}
+
+
+def claim_transaction_reference(reference: str, user) -> bool:
+    """Record that this user claimed a receipt. Returns False if already claimed by another user."""
+    from django.db import IntegrityError
+    from home.models import TransactionNumber
+
+    ref = normalize_reference(reference)
+    if not ref or not user:
+        return False
+
+    existing = TransactionNumber.objects.filter(transaction_number__iexact=ref).select_related('used_by').first()
+    if existing:
+        return existing.used_by_id == user.id
+
+    other_approved = PaymentVerificationRequest.objects.filter(
+        parsed_reference__iexact=ref,
+        status__in=(
+            PaymentVerificationRequest.STATUS_AUTO_APPROVED,
+            PaymentVerificationRequest.STATUS_MANUAL_APPROVED,
+        ),
+    ).exclude(user=user).exists()
+    if other_approved:
+        return False
+
+    try:
+        TransactionNumber.objects.create(transaction_number=ref, used_by=user)
+        return True
+    except IntegrityError:
+        existing = TransactionNumber.objects.filter(transaction_number__iexact=ref).first()
+        return bool(existing and existing.used_by_id == user.id)
+
+
 def _save_verification_request(
     user,
     receipt_text: str,
@@ -50,7 +171,7 @@ def _save_verification_request(
         return None
 
 
-def verify_and_process_payment(receipt_text: str, used_references: set, user=None) -> dict:
+def verify_and_process_payment(receipt_text: str, user=None) -> dict:
     """
     Parse Telebirr SMS, verify via API, validate amount and recipient.
     Returns dict: success, message, reference, failure_reason, request_id
@@ -76,9 +197,12 @@ def verify_and_process_payment(receipt_text: str, used_references: set, user=Non
             'db_save_failed': db_save_failed,
         }
 
-    reference = parsed['reference']
-    if reference in used_references:
-        failure = f'reference already used: {reference}'
+    reference = normalize_reference(parsed['reference'])
+    parsed['reference'] = reference
+
+    reuse = check_receipt_already_used(reference, user)
+    if reuse['blocked']:
+        failure = f'reference already used: {reference} by {reuse.get("owner") or "unknown"}'
         req = None
         if user:
             req = _save_verification_request(
@@ -88,7 +212,7 @@ def verify_and_process_payment(receipt_text: str, used_references: set, user=Non
             )
         return {
             'success': False,
-            'message': 'ይህ የክፍያ ቁጥር ቀድሞውኑ ጥቅም ላይ ውሏል።',
+            'message': reuse['message'],
             'reference': reference,
             'failure_reason': failure,
             'request_id': req.id if req else None,
@@ -168,7 +292,14 @@ def approve_payment_request(request_obj: PaymentVerificationRequest) -> bool:
 
     reference = request_obj.parsed_reference
     if reference:
-        TransactionNumber.objects.get_or_create(transaction_number=reference)
+        ref = normalize_reference(reference)
+        if check_receipt_already_used(ref, request_obj.user)['blocked']:
+            return False
+        from home.models import TransactionNumber
+        TransactionNumber.objects.get_or_create(
+            transaction_number=ref,
+            defaults={'used_by': request_obj.user},
+        )
 
     profile, _ = UserProfile.objects.get_or_create(
         user=request_obj.user,

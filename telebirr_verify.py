@@ -147,7 +147,7 @@ def parse_telebirr_receipt_text(text: str) -> Optional[dict]:
 
     return {
         'amount': amount,
-        'reference': reference,
+        'reference': reference.upper(),
         'recipient_name': recipient_name,
     }
 

@@ -4,11 +4,11 @@ from django.contrib import messages  # type:ignore
 from django.urls import reverse  # type:ignore
 from django.conf import settings  # type:ignore
 from calculator import library as lb
-from calculator.payment import verify_and_process_payment
+from calculator.payment import verify_and_process_payment, claim_transaction_reference, check_receipt_already_used
 from calculator.records import record_calculation, kokeb_result
 from calculator.labels import CALCULATOR_LIST, CALCULATOR_DESCRIPTIONS, general_context
 from .forms import RegisterForm, GeneralForm
-from .models import Message_After_Transaction
+from calculator.models import Message_After_Transaction, PaymentVerificationRequest
 from home.models import User, UserProfile, TransactionNumber, SiteStats
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
@@ -111,8 +111,7 @@ def nameandnosender(request):
             messages.info(request, msg)
             return redirect('calculator_list')
 
-        used_refs = set(TransactionNumber.objects.values_list('transaction_number', flat=True))
-        result = verify_and_process_payment(receipt_text, used_refs, user=request.user)
+        result = verify_and_process_payment(receipt_text, user=request.user)
 
         if not result['success']:
             extra = {
@@ -130,7 +129,22 @@ def nameandnosender(request):
             return redirect(reverse('calculator_list') + '#unlock')
 
         reference = result['reference']
-        TransactionNumber.objects.get_or_create(transaction_number=reference)
+        if not claim_transaction_reference(reference, request.user):
+            if result.get('request_id'):
+                PaymentVerificationRequest.objects.filter(
+                    pk=result['request_id'],
+                    status=PaymentVerificationRequest.STATUS_AUTO_APPROVED,
+                ).update(
+                    status=PaymentVerificationRequest.STATUS_REJECTED,
+                    failure_reason='reference already claimed by another account',
+                )
+            reuse = check_receipt_already_used(reference, request.user)
+            msg = reuse.get('message') or 'ይህ የክፍያ ቁጥር ቀድሞውኑ ጥቅም ላይ ውሏል።'
+            if wants_json:
+                return ajax_response(False, msg, failure_reason='reference already claimed')
+            messages.error(request, msg)
+            return redirect(reverse('calculator_list') + '#unlock')
+
         profile.status = 'allowed'
         profile.save()
         request.session['status'] = 'allowed'
