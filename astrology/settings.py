@@ -37,8 +37,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'astrology.urls'
-CSRF_TRUSTED_ORIGINS = ['https://sinekewakibt.vercel.app',]
-CSRF_COOKIE_DOMAIN = '.sinekewakibt.vercel.app'
+CSRF_TRUSTED_ORIGINS = [
+    'https://sinekewakibt.vercel.app',
+    'https://*.vercel.app',
+]
+# Let Django set the cookie for the current host (avoids CSRF failures on Vercel).
+SESSION_COOKIE_DOMAIN = os.getenv('SESSION_DOMAIN', None)
+CSRF_COOKIE_DOMAIN = os.getenv('CSRF_COOKIE_DOMAIN', None)
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -89,8 +94,6 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# For local development
-SESSION_COOKIE_DOMAIN = os.getenv('SESSION_DOMAIN', None) # Ensure the leading dot for subdomains
 SESSION_COOKIE_PATH = '/'
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Ensure you're using the DB backend
 

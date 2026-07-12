@@ -24,26 +24,30 @@ def _save_verification_request(
     validation: Optional[dict],
     status: str,
     failure_reason: str = '',
-) -> PaymentVerificationRequest:
+) -> Optional[PaymentVerificationRequest]:
     parsed = parsed or {}
     api_result = api_result or {}
     validation = validation or {}
-    return PaymentVerificationRequest.objects.create(
-        user=user,
-        receipt_text=receipt_text,
-        parsed_reference=parsed.get('reference') or validation.get('reference') or '',
-        parsed_amount=str(parsed.get('amount', '')),
-        parsed_recipient=parsed.get('recipient_name', ''),
-        api_response={
-            'success': api_result.get('success'),
-            'error': api_result.get('error'),
-            'data': validation.get('api_data') or api_result.get('data') or {},
-            'raw_body': api_result.get('raw_body'),
-        },
-        verification_checks=validation.get('checks') or {},
-        failure_reason=failure_reason or validation.get('failure_reason') or '',
-        status=status,
-    )
+    try:
+        return PaymentVerificationRequest.objects.create(
+            user=user,
+            receipt_text=receipt_text,
+            parsed_reference=parsed.get('reference') or validation.get('reference') or '',
+            parsed_amount=str(parsed.get('amount', '')),
+            parsed_recipient=parsed.get('recipient_name', ''),
+            api_response={
+                'success': api_result.get('success'),
+                'error': api_result.get('error'),
+                'data': validation.get('api_data') or api_result.get('data') or {},
+                'raw_body': api_result.get('raw_body'),
+            },
+            verification_checks=validation.get('checks') or {},
+            failure_reason=failure_reason or validation.get('failure_reason') or '',
+            status=status,
+        )
+    except Exception as exc:
+        logger.exception('Could not save PaymentVerificationRequest: %s', exc)
+        return None
 
 
 def verify_and_process_payment(receipt_text: str, used_references: set, user=None) -> dict:
@@ -55,18 +59,21 @@ def verify_and_process_payment(receipt_text: str, used_references: set, user=Non
     if not parsed:
         failure = 'SMS parse failed — incomplete or invalid Telebirr message'
         req = None
+        db_save_failed = False
         if user:
             req = _save_verification_request(
                 user, receipt_text, None, None, None,
                 PaymentVerificationRequest.STATUS_REJECTED,
                 failure,
             )
+            db_save_failed = req is None
         return {
             'success': False,
             'message': 'የቴሌብር መልዕክቱ ትክክለኛ አይደለም። ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።',
             'reference': None,
             'failure_reason': failure,
             'request_id': req.id if req else None,
+            'db_save_failed': db_save_failed,
         }
 
     reference = parsed['reference']

@@ -96,13 +96,17 @@ def nameandnosender(request):
         result = verify_and_process_payment(receipt_text, used_refs, user=request.user)
 
         if not result['success']:
-            if is_ajax:
-                return ajax_response(
-                    False,
-                    result['message'],
-                    failure_reason=result.get('failure_reason', ''),
-                    request_id=result.get('request_id'),
+            extra = {
+                'failure_reason': result.get('failure_reason', ''),
+                'request_id': result.get('request_id'),
+            }
+            if result.get('db_save_failed'):
+                extra['message'] = (
+                    result['message']
+                    + '\n\n(DB not updated — run migrations on Neon. See scripts/migrate_neon.ps1)'
                 )
+            if is_ajax:
+                return ajax_response(False, extra.get('message', result['message']), **extra)
             messages.error(request, result['message'])
             return redirect(reverse('calculator_list') + '#unlock')
 
