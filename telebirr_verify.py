@@ -202,19 +202,43 @@ def amount_from_api_total(total_paid_str: str) -> Optional[Decimal]:
         return None
 
 
+def get_api_field(data: dict, *keys: str):
+    """Return first non-empty value from API data for any of the given keys."""
+    if not data or not isinstance(data, dict):
+        return None
+    for key in keys:
+        val = data.get(key)
+        if val is not None and str(val).strip() != '':
+            return val
+    return None
+
+
+def amount_from_api_settled(data: dict) -> Optional[Decimal]:
+    """
+    Extract settledAmount from verify API data — the amount credited to the receiver
+    (excludes payer service fee). Example: settledAmount=200 Birr, serviceFee=1.74.
+    """
+    val = get_api_field(data, 'settledAmount', 'settled_amount')
+    if val is None:
+        return None
+    return amount_from_api_total(str(val))
+
+
 def amount_from_api_transfer(data: dict) -> Optional[Decimal]:
     """
     Extract the transferred/credited amount from verify API data.
-    Prefer fields that exclude the payer's Telebirr service fee — not totalPaidAmount.
+    settledAmount is authoritative; other fields may include service fees.
     """
+    settled = amount_from_api_settled(data)
+    if settled is not None:
+        return settled
+
     if not data or not isinstance(data, dict):
         return None
     for key in (
         'transferredAmount',
         'transferAmount',
-        'amount',
         'creditedAmount',
-        'settledAmount',
         'transactionAmount',
         'paidAmount',
     ):
@@ -229,22 +253,25 @@ def amount_from_api_transfer(data: dict) -> Optional[Decimal]:
 def transfer_amount_matches_expected(api_data: dict, expected: Decimal) -> bool:
     """
     Return True if API confirms the transfer amount matches expected.
-    Uses transfer-specific fields when available; totalPaidAmount may include service fee.
+    Prefer settledAmount; totalPaidAmount may include service fee on top of transfer.
     """
+    settled = amount_from_api_settled(api_data)
+    if settled is not None:
+        return settled == expected
+
     transfer_amt = amount_from_api_transfer(api_data)
     if transfer_amt is not None:
         return transfer_amt == expected
 
-    total_paid = amount_from_api_total((api_data or {}).get('totalPaidAmount', ''))
+    total_paid = amount_from_api_total(str(get_api_field(api_data, 'totalPaidAmount', 'total_paid_amount') or ''))
     if total_paid is None:
         return True  # no amount field — rely on SMS parse + other checks
 
-    # totalPaidAmount often = transfer + service fee (e.g. 200 + ~2)
     if total_paid == expected:
         return True
     if total_paid > expected:
         fee = total_paid - expected
-        return fee <= Decimal('10')  # reasonable Telebirr service fee cap
+        return fee <= Decimal('10')
 
     return False
 
@@ -262,6 +289,18 @@ def _last4_digits(value: str) -> str:
     return digits[-4:] if len(digits) >= 4 else digits
 
 
+def _last4_from_account(value: str) -> str:
+    """
+    Last 4 digits for Telebirr account numbers, including masked values like 2519****1212.
+    Uses visible trailing digits after asterisks when present.
+    """
+    s = str(value or '').strip()
+    masked = re.search(r'\*+(\d{4})\s*$', s)
+    if masked:
+        return masked.group(1)
+    return _last4_digits(s)
+
+
 def credited_party_matches(
     api_credited_name: str,
     api_credited_account_no: str,
@@ -270,24 +309,26 @@ def credited_party_matches(
 ) -> bool:
     """
     Return True if the API credited party (receiver) matches our Telebirr account in settings.
-    Match rules: (1) first name of credited party equals first name of our account holder,
-    (2) last 4 digits of credited party account number equal last 4 digits of our account number.
-    Both must match when both are provided in settings.
+    Match rules: (1) first name of creditedPartyName (e.g. Selomon) matches our holder,
+    (2) last 4 digits of creditedPartyAccountNo (e.g. 2519****1212 -> 1212) match ours.
+    Both must match when both are configured in settings.
     """
-    credited_name = (api_credited_name or '').strip()
-    credited_account = (api_credited_account_no or '').strip()
-    expected_name = (expected_holder_name or '').strip()
-    expected_number = (expected_account_number or '').strip()
+    credited_name = str(api_credited_name or '').strip()
+    credited_account = str(api_credited_account_no or '').strip()
+    expected_name = str(expected_holder_name or '').strip()
+    expected_number = str(expected_account_number or '').strip()
 
-    # First name match (credited party = our account holder)
+    if not expected_name and not expected_number:
+        return False
+
     if expected_name:
         if _first_name(credited_name) != _first_name(expected_name):
             return False
-    # Last 4 digits of phone/account number match
-    if expected_number and credited_account:
-        if _last4_digits(expected_number) != _last4_digits(credited_account):
+
+    if expected_number:
+        if not credited_account:
             return False
-    # If we have no expected name but have number, we already checked number; if we have no number but have name, we already checked name
-    if not expected_name and not expected_number:
-        return False
+        if _last4_from_account(expected_number) != _last4_from_account(credited_account):
+            return False
+
     return True

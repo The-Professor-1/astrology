@@ -6,6 +6,7 @@ from django.conf import settings
 
 from telebirr_verify import (
     credited_party_matches,
+    get_api_field,
     parse_telebirr_receipt_text,
     transfer_amount_matches_expected,
     verify_telebirr_receipt,
@@ -65,13 +66,26 @@ def verify_and_process_payment(receipt_text: str, used_references: set) -> dict:
     if not transfer_amount_matches_expected(data, expected_amount):
         return {
             'success': False,
-            'message': f'የተላከው መጠን {expected_amount} ብር መሆን አለበት (የአገልግሎት ክፍያ ብቻ ነው የተጨመረው)።',
+            'message': f'የተላከው መጠን {expected_amount} ብር መሆን አለበት።',
             'reference': reference,
         }
 
+    credited_name = get_api_field(
+        data,
+        'creditedPartyName',
+        'credited_party_name',
+        'creditedPartyAccountHolderName',
+    ) or ''
+    credited_account = get_api_field(
+        data,
+        'creditedPartyAccountNo',
+        'creditedPartyAccountNumber',
+        'credited_party_account_no',
+    ) or ''
+
     if not credited_party_matches(
-        data.get('creditedPartyName', ''),
-        data.get('creditedPartyAccountNo', ''),
+        credited_name,
+        credited_account,
         settings.TELEBIRR_ACCOUNT_HOLDER,
         settings.TELEBIRR_ACCOUNT_NUMBER,
     ):
@@ -81,8 +95,9 @@ def verify_and_process_payment(receipt_text: str, used_references: set) -> dict:
             'reference': reference,
         }
 
-    status = (data.get('transactionStatus') or '').lower()
-    if status and status not in ('completed', 'success', 'successful', 'paid'):
+    status = str(data.get('transactionStatus') or data.get('transaction_status') or '').lower()
+    failed_statuses = {'failed', 'cancelled', 'canceled', 'reversed', 'declined', 'rejected'}
+    if status in failed_statuses:
         return {
             'success': False,
             'message': f'የክፍያ ሁኔታ፡ {data.get("transactionStatus", "unknown")}',
