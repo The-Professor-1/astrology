@@ -50,7 +50,7 @@
                     <a href="{% url 'register' %}" style="color: var(--accent-gold);">Register</a> ያድርጉ።
                 </div>
                 {% else %}
-                <form method="post" action="{% url 'nameandnosender' %}" id="payment-form">
+                <form method="post" action="{{ payment_verify_url }}" id="payment-form" data-verify-url="{{ payment_verify_url }}">
                     {% csrf_token %}
                     <div class="form-group">
                         <label class="form-label" for="telebirr_receipt_text">
@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 const headers = { 'X-Requested-With': 'XMLHttpRequest' };
                 if (csrfToken) headers['X-CSRFToken'] = csrfToken;
 
-                const response = await fetch(paymentForm.action, {
+                const verifyUrl = paymentForm.dataset.verifyUrl || '/calculator/send_transaction_number/';
+                const response = await fetch(verifyUrl, {
                     method: 'POST',
                     headers,
                     body: formData,

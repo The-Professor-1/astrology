@@ -388,6 +388,7 @@ def calculators_list(request):
         'telebirr_number': settings.TELEBIRR_ACCOUNT_NUMBER,
         'telebirr_amount': settings.TELEBIRR_PAYMENT_AMOUNT,
         'calculator_descriptions': CALCULATOR_DESCRIPTIONS,
+        'payment_verify_url': reverse('nameandnosender'),
     })
 
 @profile_permission_required

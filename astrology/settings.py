@@ -39,7 +39,6 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'astrology.urls'
 CSRF_TRUSTED_ORIGINS = [
     'https://sinekewakibt.vercel.app',
-    'https://*.vercel.app',
 ]
 # Let Django set the cookie for the current host (avoids CSRF failures on Vercel).
 SESSION_COOKIE_DOMAIN = os.getenv('SESSION_DOMAIN', None)
