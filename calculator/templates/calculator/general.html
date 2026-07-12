@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
-{% block title %}Calculate{% endblock title %}
+{% block title %}{{ page_title|default:"Calculate" }}{% endblock title %}
 {% block body %}
 <div class="calc-page">
 <form method="post">
     {% csrf_token %}
     {% if address == 'kokeb_calculator' %}
         <div class="calc-form-card">
-            <h1 class="calc-form-title">⭐ Astrology Sign Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
                 <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -31,7 +31,7 @@
     {% elif address == 'wealth_calculator' %}
         
         <div class="calc-form-card">
-        <h1 class="calc-form-title">💰 Wealth Luck Calculator</h1>
+        <h1 class="calc-form-title">{{ page_title }}</h1>
         {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
         {% endif %}
@@ -50,7 +50,7 @@
     {% elif address == 'behavior_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🧠 Behavior Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -68,7 +68,7 @@
     {% elif address == 'marriage_luck' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">💍 Marriage Luck Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -87,7 +87,7 @@
     {% elif address == 'place_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🏠 Place Luck Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -107,7 +107,7 @@
     {% elif address == 'servant_behavior' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">👤 Servant Behavior Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -126,7 +126,7 @@
     {% elif address == 'legal_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">⚖️ Legal Case Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -146,7 +146,7 @@
     {% elif address == 'marriage_length' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">⏳ Marriage Length Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -165,7 +165,7 @@
     {% elif address == 'life_luck_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🌟 Life Luck Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -184,7 +184,7 @@
     {% elif address == 'enemy_behavior_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">⚔️ Enemy Behavior Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -202,7 +202,7 @@
     {% elif address == 'born_prophecy_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">👶 Child Birth Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -223,7 +223,7 @@
     {% elif address == 'pregnancy_prophecy_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🤰 Pregnancy Prophecy Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -242,7 +242,7 @@
     {% elif address == 'patient_prophecy_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🏥 Patient Prophecy Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -264,7 +264,7 @@
     {% elif address == 'love_prophecy_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">❤️ Love Prophecy Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}
@@ -283,7 +283,7 @@
     {% elif address == 'military_prophecy_calculator' %}
         
         <div class="calc-form-card">
-            <h1 class="calc-form-title">🛡️ War Prophecy Calculator</h1>
+            <h1 class="calc-form-title">{{ page_title }}</h1>
             {% if error_message %}
             <p class="error-msg">{{ error_message }}</p>
             {% endif %}

@@ -128,24 +128,10 @@
 {% endblock body %}
 
 {% block extra_js %}
+{{ calculator_descriptions|json_script:"calc-desc-data" }}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const definitions = {
-        'የሃብት እጣ ፈንታን ለማወቅ': 'የእርስዎን የሃብት እድል እና ጥሩ ጊዜ ለማወቅ።',
-        'ስለ ጠባይ ለማወቅ': 'የግል ጸባይዎን እና ባህሪዎን መተንበይ።',
-        'ስለ መኖሪያ ቦታ ምቹነት': 'መኖሪያ ቦታ ለእርስዎ ተስማሚ መሆኑን ለማወቅ።',
-        'ስለ ትዳር በረከት ለማወቅ': 'በትዳር ውስጥ ማን በረከት እንዳለው ለማወቅ።',
-        'ሰለሚወለድ ልጅ ለማዎቅ': 'ምን አይነት ልጅ ሊወለድ እንደሚችል መተንበይ።',
-        'ለተፀነሰ ትንቢት': 'የፅንስ እጣ ፋንታ ለማወቅ።',
-        'ስለ ፍቅር ትንቢት': 'የሁለት ሰዎች ፍቅር ጥሩ መሆን አለመሆኑን ለማወቅ።',
-        'ስለ በሽተኛ ሁኔታ ለማወቅ': 'የበሽተኛ መጨረሻ ለመተንበይ።',
-        'ስለ ፍርድ ውሳኔ ለማወቅ': 'የፍርድ ውሳኔ መተንበይ።',
-        'ስለ ትዳር ቆይታ ለማወቅ': 'የትዳር ህይወት እና ቆይታ ለመተንበይ።',
-        'ስለ ጠላት ፀባይ ለማወቅ': 'ጠላትዎ ባህሪ ለማወቅ።',
-        'ስለራስ ኑሮ እድል ለማወቅ': 'የኑሮ እድልዎን ለማወቅ።',
-        'ወደ ጦርነት ለሄደ ወይም ለሚሄድ': 'ጦርነት ውስጥ የሚገጥም ለመተንበይ።',
-        'ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ': 'ሰራተኛ ጸባይ ለማወቅ።',
-    };
+    const definitions = JSON.parse(document.getElementById('calc-desc-data').textContent);
 
     const modal = document.getElementById('popup-modal');
     const closeBtn = document.getElementById('close-popup');

@@ -1,24 +1,7 @@
 from django.conf import settings
 from django.db import models  # type: ignore
 
-CALCULATOR_LABELS = {
-    'kokeb_calculator': 'ኮከብ ስሌት',
-    'wealth_calculator': 'የሃብት እጣ ፈንታ',
-    'behavior_calculator': 'ስለ ጠባይ',
-    'place_calculator': 'መኖሪያ ቦታ',
-    'marriage_luck': 'ትዳር በረከት',
-    'servant_behavior': 'ሰራተኛ ጸባይ',
-    'born_prophecy_calculator': 'የልጅ ስሌት',
-    'love_prophecy_calculator': 'ፍቅር ትንቢት',
-    'pregnancy_prophecy_calculator': 'ፅንስ ትንቢት',
-    'military_prophecy_calculator': 'ጦርነት ትንቢት',
-    'life_luck_calculator': 'የህይወት እድል',
-    'patient_prophecy_calculator': 'በሽተኛ ትንቢት',
-    'legal_calculator': 'ፍርድ ውሳኔ',
-    'enemy_behavior_calculator': 'ጠላት ጸባይ',
-    'marriage_length': 'ትዳር ቆይታ',
-}
-
+from calculator.labels import CALCULATOR_LABELS
 
 class Users(models.Model):
     """Legacy kokeb records — no longer written; kept for existing data."""

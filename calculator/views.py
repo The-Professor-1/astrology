@@ -6,6 +6,7 @@ from django.conf import settings  # type:ignore
 from calculator import library as lb
 from calculator.payment import verify_and_process_payment
 from calculator.records import record_calculation, kokeb_result
+from calculator.labels import CALCULATOR_LIST, CALCULATOR_DESCRIPTIONS, general_context
 from .forms import RegisterForm, GeneralForm
 from .models import Message_After_Transaction
 from home.models import User, UserProfile, TransactionNumber, SiteStats
@@ -228,10 +229,10 @@ def calculate(request):
             description = lb.kokeb_disc_pair().get(title, '')
             context = {'sign': title, 'description': description}
             return render(request, 'calculator/description.html', context)
-    return render(request, 'calculator/general.html', {
-        'form': form, 'user': user, 'address': address, 'kokeb_calculator_visit': stats.kokeb_calculator_visits,
-        'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        address, form=form, user=user, kokeb_calculator_visit=stats.kokeb_calculator_visits,
+        error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def wealth_view(request):
@@ -257,9 +258,9 @@ def wealth_view(request):
                     }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating wealth: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'result': result, 'address': address, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        address, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def behavior_view(request):
@@ -283,9 +284,9 @@ def behavior_view(request):
                     }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'result': result, 'address': address, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        address, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def place_view(request):
@@ -313,9 +314,9 @@ def place_view(request):
                     }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating place luck: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'result': result, 'address': address, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        address, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def marriage_luck_view(request):
@@ -341,31 +342,15 @@ def marriage_luck_view(request):
                     }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating marriage luck: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'result': result, 'address': address, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        address, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 def calculators_list(request):
     stats, created = SiteStats.objects.get_or_create(id=1)
     stats.calculators_list_visits += 1
     stats.save()
-    urls = [
-        ('calculate', 'ኮከብዎን ለማዎቅ', 'home-big-image.png'),
-        ('wealth_calculator', 'የሃብት እጣ ፈንታን ለማወቅ', 'home-big-image.png'),
-        ('behavior_calculator', 'ስለ ጠባይ ለማወቅ', 'home-big-image.png'),
-        ('place_calculator', 'ስለ መኖሪያ ቦታ ምቹነት', 'home-big-image.png'),
-        ('marriage_luck_calculator', 'ስለ ትዳር በረከት ለማወቅ', 'home-big-image.png'),
-        ('birth_prophecy', 'ሰለሚወለድ ልጅ ለማዎቅ', 'home-big-image.png'),
-        ('pregnancy_prophecy', 'ለተፀነሰ ትንቢት', 'home-big-image.png'),
-        ('love_prophecy', 'ስለ ፍቅር ትንቢት', 'home-big-image.png'),
-        ('patient_prophecy', 'ስለ በሽተኛ ሁኔታ ለማወቅ', 'home-big-image.png'),
-        ('legal_prophecy', 'ስለ ፍርድ ውሳኔ ለማወቅ', 'home-big-image.png'),
-        ('marriage_length_prophecy', 'ስለ ትዳር ቆይታ ለማወቅ', 'home-big-image.png'),
-        ('enemy_behavior', 'ስለ ጠላት ፀባይ ለማወቅ', 'home-big-image.png'),
-        ('life_luck', 'ስለራስ ኑሮ እድል ለማወቅ', 'home-big-image.png'),
-        ('military_prophecy', 'ወደ ጦርነት ለሄደ ወይም ለሚሄድ', 'home-big-image.png'),
-        ('servant_behavior', 'ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ', 'home-big-image.png'),
-    ]
+    urls = CALCULATOR_LIST
     admin = request.session.get('admin', 0)
     status = request.session.get('status', '')
     return render(request, 'calculator/calculator_list.html', {
@@ -376,6 +361,7 @@ def calculators_list(request):
         'telebirr_holder': settings.TELEBIRR_ACCOUNT_HOLDER,
         'telebirr_number': settings.TELEBIRR_ACCOUNT_NUMBER,
         'telebirr_amount': settings.TELEBIRR_PAYMENT_AMOUNT,
+        'calculator_descriptions': CALCULATOR_DESCRIPTIONS,
     })
 
 @profile_permission_required
@@ -408,9 +394,9 @@ def servant_behavior(request):
                         }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def birth_prophecy(request):
@@ -449,9 +435,9 @@ def birth_prophecy(request):
                             }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def love_prophecy(request):
@@ -483,9 +469,9 @@ def love_prophecy(request):
                         }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def pregnancy_prophecy(request):
@@ -517,9 +503,9 @@ def pregnancy_prophecy(request):
                         }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def military_prophecy(request):
@@ -558,9 +544,9 @@ def military_prophecy(request):
                             }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def life_luck(request):
@@ -592,9 +578,9 @@ def life_luck(request):
                         }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def patient_prophecy(request):
@@ -636,9 +622,9 @@ def patient_prophecy(request):
                             }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def legal_prophecy(request):
@@ -677,9 +663,9 @@ def legal_prophecy(request):
                             }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def enemy_behavior(request):
@@ -704,9 +690,9 @@ def enemy_behavior(request):
                     }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
 
 @profile_permission_required
 def marriage_length_prophecy(request):
@@ -738,6 +724,6 @@ def marriage_length_prophecy(request):
                         }, result)
             except Exception as e:
                 messages.error(request, f"Error calculating behavior: {str(e)}")
-    return render(request, 'calculator/general.html', {
-        'form': form, 'address': url, 'result': result, 'error_message': error_message, 'invalid_field': invalid_field
-    })
+    return render(request, 'calculator/general.html', general_context(
+        url, form=form, result=result, error_message=error_message, invalid_field=invalid_field,
+    ))
