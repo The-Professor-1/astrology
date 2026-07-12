@@ -5,9 +5,9 @@ from decimal import Decimal
 from django.conf import settings
 
 from telebirr_verify import (
-    amount_from_api_total,
     credited_party_matches,
     parse_telebirr_receipt_text,
+    transfer_amount_matches_expected,
     verify_telebirr_receipt,
 )
 
@@ -62,11 +62,10 @@ def verify_and_process_payment(receipt_text: str, used_references: set) -> dict:
         }
 
     data = api_result.get('data') or {}
-    api_amount = amount_from_api_total(data.get('totalPaidAmount', ''))
-    if api_amount is not None and api_amount != expected_amount:
+    if not transfer_amount_matches_expected(data, expected_amount):
         return {
             'success': False,
-            'message': f'API የክፍያ መጠን {api_amount} ብር ነው — {expected_amount} ብር መሆን አለበት።',
+            'message': f'የተላከው መጠን {expected_amount} ብር መሆን አለበት (የአገልግሎት ክፍያ ብቻ ነው የተጨመረው)።',
             'reference': reference,
         }
 

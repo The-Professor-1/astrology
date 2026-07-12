@@ -45,8 +45,13 @@ def nameandnosender(request):
     if request.method != 'POST':
         return redirect('calculator_list')
 
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     if not request.user.is_authenticated:
-        messages.error(request, 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።')
+        msg = 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።'
+        if is_ajax:
+            return JsonResponse({'success': False, 'message': msg}, status=401)
+        messages.error(request, msg)
         return redirect('login')
 
     action = request.POST.get('action')
@@ -55,23 +60,34 @@ def nameandnosender(request):
 
     username = request.user.username
     if username == 'professor':
-        messages.info(request, 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።')
+        msg = 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።'
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': msg})
+        messages.info(request, msg)
         return redirect('calculator_list')
 
     receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
     if not receipt_text:
-        messages.error(request, 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።')
+        msg = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።'
+        if is_ajax:
+            return JsonResponse({'success': False, 'message': msg})
+        messages.error(request, msg)
         return redirect(reverse('calculator_list') + '#unlock')
 
     profile = UserProfile.objects.get(user=request.user)
     if profile.status == 'allowed':
-        messages.info(request, 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።')
+        msg = 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።'
+        if is_ajax:
+            return JsonResponse({'success': True, 'message': msg})
+        messages.info(request, msg)
         return redirect('calculator_list')
 
     used_refs = set(TransactionNumber.objects.values_list('transaction_number', flat=True))
     result = verify_and_process_payment(receipt_text, used_refs)
 
     if not result['success']:
+        if is_ajax:
+            return JsonResponse({'success': False, 'message': result['message']})
         messages.error(request, result['message'])
         return redirect(reverse('calculator_list') + '#unlock')
 
@@ -88,6 +104,8 @@ def nameandnosender(request):
         status='allowed',
     )
 
+    if is_ajax:
+        return JsonResponse({'success': True, 'message': result['message']})
     messages.success(request, result['message'])
     return redirect('calculator_list')
 

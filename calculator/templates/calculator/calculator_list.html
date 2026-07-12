@@ -39,9 +39,9 @@
                 </div>
 
                 <ol style="color: var(--text-muted); font-size: 0.875rem; margin: 0 0 1.25rem 1.25rem; line-height: 1.8;">
-                    <li>በ Telebirr መተግበሪያ {{ telebirr_amount }} ብር ይላኩ</li>
-                    <li>ከ Telebirr የሚመጣውን <strong style="color: var(--text-primary);">ሙሉ SMS መልዕክት</strong> ከታች ይጽፉ</li>
-                    <li>«Verify Payment» ይጫኑ — ፈቃድ በራስ-ሰር ይከፈታል</li>
+                    <li>ከላይ በተቀመጠው ስልክ በ Telebirr መተግበሪያ {{ telebirr_amount }} ብር ይላኩ</li>
+                    <li>ካስተላለፉ በኋላ ከቴሌብር የሚላክልዎትን ሙሉ SMS መልዕክት ኮፒ አድርገው ከታች ባለው ሳጥን ያስገቡ</li>
+                    <li>ከዛም «Verify Payment» የሚለውን ይጫኑ — ከማረጋገጫ በኋላ ፈቃዱ ይሰጥዎታል።</li>
                 </ol>
 
                 {% if not user.is_authenticated %}
@@ -50,7 +50,7 @@
                     <a href="{% url 'register' %}" style="color: var(--accent-gold);">Register</a> ያድርጉ።
                 </div>
                 {% else %}
-                <form method="post" action="{% url 'nameandnosender' %}">
+                <form method="post" action="{% url 'nameandnosender' %}" id="payment-form">
                     {% csrf_token %}
                     <div class="form-group">
                         <label class="form-label" for="telebirr_receipt_text">
@@ -68,7 +68,7 @@
                             የ SMS መልዕክቱን ሙሉ በሙሉ ይጽፉ — በእንግሊዝኛ፣ በአማርኛ ወይም በ Afaan Oromoo ሊሆን ይችላል።
                         </p>
                     </div>
-                    <button type="submit" name="action" value="send_nameandnumber" class="btn btn-gold" style="width: 100%;">
+                    <button type="submit" name="action" value="send_nameandnumber" class="btn btn-gold" style="width: 100%;" id="verify-payment-btn">
                         ✓ Verify Payment &amp; Unlock
                     </button>
                 </form>
@@ -102,6 +102,26 @@
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <a href="#unlock" class="btn btn-gold" id="popup-unlock">Unlock Now</a>
             <button type="button" class="btn btn-outline" id="close-popup">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Payment verification modal -->
+<div class="modal-overlay" id="verify-modal">
+    <div class="modal-box verify-modal-box">
+        <div id="verify-modal-loading" class="verify-modal-state">
+            <div class="spinner" aria-hidden="true"></div>
+            <p class="verify-modal-text">ክፍያዎን እያረጋገጥን ነው…<br><span style="color: var(--text-muted); font-size: 0.85rem;">እባክዎ ጥቂት ይጠብቁ</span></p>
+        </div>
+        <div id="verify-modal-success" class="verify-modal-state hidden">
+            <div class="verify-icon verify-icon-success">✓</div>
+            <p id="verify-success-message" class="verify-modal-text"></p>
+            <button type="button" class="btn btn-gold" id="verify-success-reload" style="width: 100%; margin-top: 1rem;">Continue</button>
+        </div>
+        <div id="verify-modal-error" class="verify-modal-state hidden">
+            <div class="verify-icon verify-icon-error">✕</div>
+            <p id="verify-error-message" class="verify-modal-text"></p>
+            <button type="button" class="btn btn-outline" id="verify-error-close" style="width: 100%; margin-top: 1rem;">Close</button>
         </div>
     </div>
 </div>
@@ -144,6 +164,83 @@ document.addEventListener('DOMContentLoaded', function () {
     closeBtn.addEventListener('click', () => modal.classList.remove('open'));
     unlockBtn.addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+    // Payment verification with spinner modal
+    const paymentForm = document.getElementById('payment-form');
+    const verifyModal = document.getElementById('verify-modal');
+    const verifyLoading = document.getElementById('verify-modal-loading');
+    const verifySuccess = document.getElementById('verify-modal-success');
+    const verifyError = document.getElementById('verify-modal-error');
+    const verifySuccessMsg = document.getElementById('verify-success-message');
+    const verifyErrorMsg = document.getElementById('verify-error-message');
+
+    function showVerifyState(state) {
+        verifyLoading.classList.toggle('hidden', state !== 'loading');
+        verifySuccess.classList.toggle('hidden', state !== 'success');
+        verifyError.classList.toggle('hidden', state !== 'error');
+    }
+
+    function openVerifyModal(state) {
+        showVerifyState(state);
+        verifyModal.classList.add('open');
+    }
+
+    function closeVerifyModal() {
+        verifyModal.classList.remove('open');
+    }
+
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const textarea = document.getElementById('telebirr_receipt_text');
+            if (!textarea.value.trim()) {
+                verifyErrorMsg.textContent = 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።';
+                openVerifyModal('error');
+                return;
+            }
+
+            openVerifyModal('loading');
+            const btn = document.getElementById('verify-payment-btn');
+            btn.disabled = true;
+
+            try {
+                const formData = new FormData(paymentForm);
+                const response = await fetch(paymentForm.action, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData,
+                });
+                let data;
+                try {
+                    data = await response.json();
+                } catch (_) {
+                    throw new Error('invalid_json');
+                }
+
+                if (data.success) {
+                    verifySuccessMsg.textContent = data.message;
+                    openVerifyModal('success');
+                } else {
+                    verifyErrorMsg.textContent = data.message;
+                    openVerifyModal('error');
+                }
+            } catch (err) {
+                verifyErrorMsg.textContent = 'ስህተት ተከስቷል። እባክዎ እንደገና ይሞክሩ።';
+                openVerifyModal('error');
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    }
+
+    document.getElementById('verify-success-reload')?.addEventListener('click', () => {
+        window.location.reload();
+    });
+    document.getElementById('verify-error-close')?.addEventListener('click', closeVerifyModal);
+    verifyModal?.addEventListener('click', e => {
+        if (e.target === verifyModal && !verifyLoading.classList.contains('hidden')) return;
+        if (e.target === verifyModal && verifyError.classList.contains('hidden') === false) closeVerifyModal();
+    });
 });
 </script>
 {% endblock extra_js %}

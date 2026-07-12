@@ -192,7 +192,7 @@ def normalize_credited_party_for_comparison(name: str) -> str:
 
 
 def amount_from_api_total(total_paid_str: str) -> Optional[Decimal]:
-    """Parse '101.00 Birr' or '101.00' from API totalPaidAmount."""
+    """Parse '101.00 Birr' or '101.00' from API amount strings."""
     if not total_paid_str:
         return None
     s = str(total_paid_str).replace('Birr', '').replace('birr', '').strip()
@@ -200,6 +200,53 @@ def amount_from_api_total(total_paid_str: str) -> Optional[Decimal]:
         return Decimal(s)
     except Exception:
         return None
+
+
+def amount_from_api_transfer(data: dict) -> Optional[Decimal]:
+    """
+    Extract the transferred/credited amount from verify API data.
+    Prefer fields that exclude the payer's Telebirr service fee — not totalPaidAmount.
+    """
+    if not data or not isinstance(data, dict):
+        return None
+    for key in (
+        'transferredAmount',
+        'transferAmount',
+        'amount',
+        'creditedAmount',
+        'settledAmount',
+        'transactionAmount',
+        'paidAmount',
+    ):
+        val = data.get(key)
+        if val is not None and val != '':
+            amt = amount_from_api_total(str(val))
+            if amt is not None:
+                return amt
+    return None
+
+
+def transfer_amount_matches_expected(api_data: dict, expected: Decimal) -> bool:
+    """
+    Return True if API confirms the transfer amount matches expected.
+    Uses transfer-specific fields when available; totalPaidAmount may include service fee.
+    """
+    transfer_amt = amount_from_api_transfer(api_data)
+    if transfer_amt is not None:
+        return transfer_amt == expected
+
+    total_paid = amount_from_api_total((api_data or {}).get('totalPaidAmount', ''))
+    if total_paid is None:
+        return True  # no amount field — rely on SMS parse + other checks
+
+    # totalPaidAmount often = transfer + service fee (e.g. 200 + ~2)
+    if total_paid == expected:
+        return True
+    if total_paid > expected:
+        fee = total_paid - expected
+        return fee <= Decimal('10')  # reasonable Telebirr service fee cap
+
+    return False
 
 
 def _first_name(full_name: str) -> str:
