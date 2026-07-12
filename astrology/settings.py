@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,3 +99,9 @@ LOGIN_REDIRECT_URL = '/home/'  # Redirect after login
 LOGOUT_REDIRECT_URL = '/home/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Telebirr automatic payment verification
+TELEBIRR_API_KEY = os.getenv('TELEBIRR_API_KEY', '')
+TELEBIRR_ACCOUNT_HOLDER = os.getenv('TELEBIRR_ACCOUNT_HOLDER', 'Selomon')
+TELEBIRR_ACCOUNT_NUMBER = os.getenv('TELEBIRR_ACCOUNT_NUMBER', '0988891212')
+TELEBIRR_PAYMENT_AMOUNT = Decimal(os.getenv('TELEBIRR_PAYMENT_AMOUNT', '200'))

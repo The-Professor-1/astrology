@@ -1,138 +1,149 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
 {% load static %}
 {% block title %}Calculators{% endblock title %}
+
 {% block body %}
+<section class="section" style="padding-top: 2rem;">
+    <div class="container">
+        <div class="section-header">
+            <h2>የስሌት አገልግሎቶች</h2>
+            <p>ከጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት ቀመር — ኮከብ፣ ሀብት፣ ትዳር፣ ትንቢት እና ሌሎችም</p>
+        </div>
 
-<!-- Include Font Awesome for Lock Icon -->
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<center>
-    
-<ul class="space-y-2 w-full lg:w-1/2 mt-24">
-        <li>
-            <button class="bg-blue-600 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg hover:bg-blue-900 hover:scale-105 hover:text-white" onclick="toggleFAQ('1')">ሁሉንም አገልግሎቶች ለማግኘት</button>
-            <div id="1" class="hidden bg-white p-4 ml-10 mt-2 rounded">
-            በዚህ ገጽ ላይ ያሉትን የሀብት፣የትዳር፣የፍቅር፣የባህሪ እንዲሁም ሌሎች ስሌቶችን የአገልግሎት ክፍያ በመክፈል ማስላት የሚችሉ ሲሆን ክፍያውን የሚፈጽሙት በቴሌብር መተግበሪያ ነው፡፡
-             ክፍያውን ከዚህ በታች ባለው መረጃ መሰረት መፈፀም ይችላሉ፡፡
-             <BR><div class="text-md text-gray-700"><i>የቴሌብር አካውንት ስም ፡ ሰለሞን (solomon)<BR> የቴሌብር አካውንት ስልክ ፡ 0988891212<BR>የክፍያው መጠን ፡ 199ብር</i></div><BR>
-             ክፍያውን ከፈፀሙ በሁዋላ የሚያገኙትን የክፍያ ቁጥር(transaction number) ከታች ባለው ሳጥን ይላኩልን፡፡ ክፍያውን ካረጋገጥን በሁዋላ አገልግሎቱን የሚያገኙበትን ፈቃድ እንሰጥዎታለን፡፡<br>
-            የክፍያው ሂደት ከታች በፎቶ ተቀምጧል፡፡<br>
-            <form method="post" action="{% url 'nameandnosender' %}">
-            {% csrf_token %}
-            <input type="hidden" class="border rounded p-1 border-black w-1/2" name="username" value="{{ user.username }}"><BR>
-                <input required class="border rounded p-1 border-black mt-2 w-1/2" type="text" name="transaction_number" placeholder="የክፍያ ቁጥር..."><BR>
-                    <button class="bg-blue-500 mt-4 w-20 p-1 rounded text-white" type="submit" name="action" value="send_nameandnumber">send</button>
-        </form></div>
-        </li>
-</ul>
-</center>
-<div class="flex flex-wrap justify-center gap-6 mt-20 px-4">
-    {% for url, label, image in urls %}
-        {% if forloop.first or admin == 1 or status == 'allowed' %}
-
-            <!-- Accessible Item (First item or Admin) -->
-            <a href="{% url url %}" class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200">
-                <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
-                style="background-image: url('{% static 'images/' %}{{ image }}');">
-                <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
-                </div>
-                <div class="relative z-10 text-lg lg:text-2xl flex items-center justify-center h-full font-semibold text-center">
-                    {{ label }}
-                </div>
-            </a>
+        {% if status == 'allowed' or admin == 1 %}
+        <div class="alert alert-success" style="max-width: 40rem; margin: 0 auto 2rem;">
+            ✓ ፈቃድ አለዎት — ሁሉንም premium አገልግሎቶች መጠቀም ይችላሉ።
+        </div>
         {% else %}
-            <!-- Locked Item with Popup -->
-            <div class="w-24 lg:w-48 h-24 lg:h-48 relative text-lg lg:text-2xl text-white transition-all duration-300 hover:scale-105 hover:text-gray-200 cursor-pointer locked-item" data-label="{{ label }}">
-                <div class="absolute inset-0 bg-cover bg-center rounded-lg transition-all duration-300 hover:brightness-125 hover:shadow-lg" 
-                     style="background-image: url('{% static 'images/' %}{{ image }}');">
-                    <div class="absolute inset-0 bg-black bg-opacity-60 rounded-lg hover:bg-opacity-40 transition-all"></div>
-                </div>
-                <!-- Lock Icon -->
-                <i class="fas fa-lock absolute top-2 right-2 text-white text-xl z-20"></i>
-                <div class="relative z-10 text-lg lg:text-2xl flex items-center justify-center h-full font-semibold text-center">
-                    {{ label }}
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-</div>
+        <!-- Payment unlock panel -->
+        <div id="unlock" class="payment-panel">
+            <div class="card card-glow">
+                <h2 style="font-size: 1.35rem; margin-bottom: 0.5rem;">🔓 Premium አገልግሎቶችን ይክፈቱ</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                    የሀብት፣ ትዳር፣ ፍቅር፣ ትንቢት እና ሌሎች ስሌቶችን ለመጠቀም በ Telebirr ክፍያ ያድርጉ። ክፍያ ከተረጋገጠ በኋላ ፈቃድ በራስ-ሰር ይከፈታል።
+                </p>
 
-<!-- Popup Modal -->
-<div id="popup-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-        <h3 id="popup-title" class="text-xl font-bold mb-2"></h3>
-        <p id="popup-definition" class="text-gray-700"></p>
-        <button id="close-popup" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Close</button>
+                <div class="payment-details">
+                    <div class="payment-detail-row">
+                        <span>Telebirr Account</span>
+                        <span>{{ telebirr_holder }}</span>
+                    </div>
+                    <div class="payment-detail-row">
+                        <span>ስልክ ቁጥር</span>
+                        <span>{{ telebirr_number }}</span>
+                    </div>
+                    <div class="payment-detail-row">
+                        <span>የክፍያ መጠን</span>
+                        <span>{{ telebirr_amount }} ብር</span>
+                    </div>
+                </div>
+
+                <ol style="color: var(--text-muted); font-size: 0.875rem; margin: 0 0 1.25rem 1.25rem; line-height: 1.8;">
+                    <li>በ Telebirr መተግበሪያ {{ telebirr_amount }} ብር ይላኩ</li>
+                    <li>ከ Telebirr የሚመጣውን <strong style="color: var(--text-primary);">ሙሉ SMS መልዕክት</strong> ከታች ይጽፉ</li>
+                    <li>«Verify Payment» ይጫኑ — ፈቃድ በራስ-ሰር ይከፈታል</li>
+                </ol>
+
+                {% if not user.is_authenticated %}
+                <div class="alert alert-info">
+                    ክፍያ ለማረጋገጥ <a href="{% url 'login' %}" style="color: var(--accent-gold);">Login</a> ወይም
+                    <a href="{% url 'register' %}" style="color: var(--accent-gold);">Register</a> ያድርጉ።
+                </div>
+                {% else %}
+                <form method="post" action="{% url 'nameandnosender' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="telebirr_receipt_text">
+                            ከ Telebirr የተላከው ሙሉ መልዕክት
+                        </label>
+                        <textarea
+                            id="telebirr_receipt_text"
+                            name="telebirr_receipt_text"
+                            class="form-textarea"
+                            rows="6"
+                            required
+                            placeholder="Dear ... You have transferred ETB {{ telebirr_amount }}.00 to {{ telebirr_holder }} ({{ telebirr_number }}) ... Your transaction number is XXXXX ..."
+                        ></textarea>
+                        <p class="form-hint">
+                            የ SMS መልዕክቱን ሙሉ በሙሉ ይጽፉ — በእንግሊዝኛ፣ በአማርኛ ወይም በ Afaan Oromoo ሊሆን ይችላል።
+                        </p>
+                    </div>
+                    <button type="submit" name="action" value="send_nameandnumber" class="btn btn-gold" style="width: 100%;">
+                        ✓ Verify Payment &amp; Unlock
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Calculator grid -->
+        <div class="calc-grid">
+            {% for url, label, image in urls %}
+                {% if forloop.first or admin == 1 or status == 'allowed' %}
+                <a href="{% url url %}" class="calc-tile {% if forloop.first %}free{% endif %}">
+                    <span class="calc-tile-label">{{ label }}</span>
+                </a>
+                {% else %}
+                <div class="calc-tile locked" data-label="{{ label }}" data-scroll="#unlock">
+                    <span class="calc-tile-label">{{ label }}</span>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Locked item modal -->
+<div class="modal-overlay" id="popup-modal">
+    <div class="modal-box">
+        <h3 id="popup-title"></h3>
+        <p id="popup-definition"></p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="#unlock" class="btn btn-gold" id="popup-unlock">Unlock Now</a>
+            <button type="button" class="btn btn-outline" id="close-popup">Close</button>
+        </div>
     </div>
 </div>
+{% endblock body %}
 
-<!-- JavaScript for Popup -->
+{% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const lockedItems = document.querySelectorAll('.locked-item');
-    const popupModal = document.getElementById('popup-modal');
-    const popupTitle = document.getElementById('popup-title');
-    const popupDefinition = document.getElementById('popup-definition');
-    const closePopup = document.getElementById('close-popup');
-
-    // Definitions for each locked item (customize as needed)
     const definitions = {
-        'የሃብት እጣ ፈንታን ለማወቅ': 'በዚህ ስሌት የእርስዎን የሃብት እድል መጨረሻ ማወቅ ይችላሉ።',
-        'ስለ ጠባይ ለማወቅ': 'በዚህ ስሌት የእርስዎ ጸባይ ምን አይነት እንደሆነ ማወቅ ይችላሉ።',
-        'ስለ መኖሪያ ቦታ ምቹነት': 'በዚህ ስሌት ለመኖር ያሰቡበት ቦታ ለእርስዎ የሚስማማ እንደሆነ ማወቅ ይችላሉ።',
-        'ስለ ትዳር በረከት ለማወቅ': 'በዚህ ስሌት በትዳር ውስጥ ማን በረከት እንዳለው ማወቅ ይችላሉ።',
-        'ሰለሚወለድ ልጅ ለማዎቅ': 'በዚህ ስሌት ምን አይነት ልጅ ሊወለድ እንደሚችል መተንበይ ይችላሉ።',
-        'ለተፀነሰ ትንቢት': 'በዚህ ስሌት የፅንሱን እጣ ፋንታ ማወቅ ይችላሉ።',
-        'ስለ ፍቅር ትንቢት': 'በዚህ ስሌት የሁለት ሰዎች ፍቅር ጥሩ መሆን አለመሆኑን ማወቅ ይችላሉ።',
-        'ስለ በሽተኛ ሁኔታ ለማወቅ': 'በዚህ ስሌት የአንድን በሽተኛ መጨረሻ መተንበይ ይችላሉ።',
-        'ስለ ፍርድ ውሳኔ ለማወቅ': 'በዚህ ስሌት የሚገጥምዎትን የፍርድ ውሳኔ መተንበይ ይችላሉ።',
-        'ስለ ትዳር ቆይታ ለማወቅ': 'በዚህ ስሌት ስልሚያሳልፉት የትዳር ህይወት እና ማን በሞት እንደሚቀድም መተንበይ ይችላሉ።',
-        'ስለ ጠላት ፀባይ ለማወቅ': 'በዚህ ስሌት ጠላትዎ ምን አይነት ባህሪ እንዳለው ማወቅ ይችላሉ።',
-        'ስለራስ ኑሮ እድል ለማወቅ': 'በዚህ ስሌት የእርስዎ እድል በምን እንዳለ ማወቅ ይችላሉ።',
-        'ወደ ጦርነት ለሄደ ወይም ለሚሄድ': 'በዚህ ስሌት በጦርነት ያለ ምን እንደሚገጥመው መተንበይ ይችላሉ።',
-        'ስለ ሰራተኛ ጸባይ ለማወቅ': 'በዚህ ስሌት ለእርስዎ ስለሚሰራ ሰው ጸባይ ማወቅ ይችላሉ።',
+        'የሃብት እጣ ፈንታን ለማወቅ': 'የእርስዎን የሃብት እድል እና ጥሩ ጊዜ ለማወቅ።',
+        'ስለ ጠባይ ለማወቅ': 'የግል ጸባይዎን እና ባህሪዎን መተንበይ።',
+        'ስለ መኖሪያ ቦታ ምቹነት': 'መኖሪያ ቦታ ለእርስዎ ተስማሚ መሆኑን ለማወቅ።',
+        'ስለ ትዳር በረከት ለማወቅ': 'በትዳር ውስጥ ማን በረከት እንዳለው ለማወቅ።',
+        'ሰለሚወለድ ልጅ ለማዎቅ': 'ምን አይነት ልጅ ሊወለድ እንደሚችል መተንበይ።',
+        'ለተፀነሰ ትንቢት': 'የፅንስ እጣ ፋንታ ለማወቅ።',
+        'ስለ ፍቅር ትንቢት': 'የሁለት ሰዎች ፍቅር ጥሩ መሆን አለመሆኑን ለማወቅ።',
+        'ስለ በሽተኛ ሁኔታ ለማወቅ': 'የበሽተኛ መጨረሻ ለመተንበይ።',
+        'ስለ ፍርድ ውሳኔ ለማወቅ': 'የፍርድ ውሳኔ መተንበይ።',
+        'ስለ ትዳር ቆይታ ለማወቅ': 'የትዳር ህይወት እና ቆይታ ለመተንበይ።',
+        'ስለ ጠላት ፀባይ ለማወቅ': 'ጠላትዎ ባህሪ ለማወቅ።',
+        'ስለራስ ኑሮ እድል ለማወቅ': 'የኑሮ እድልዎን ለማወቅ።',
+        'ወደ ጦርነት ለሄደ ወይም ለሚሄድ': 'ጦርነት ውስጥ የሚገጥም ለመተንበይ።',
+        'ስለ ሰራተኛ ጸባይ ለማወቅለማወቅ': 'ሰራተኛ ጸባይ ለማወቅ።',
     };
 
-    lockedItems.forEach(item => {
+    const modal = document.getElementById('popup-modal');
+    const closeBtn = document.getElementById('close-popup');
+    const unlockBtn = document.getElementById('popup-unlock');
+
+    document.querySelectorAll('.calc-tile.locked').forEach(item => {
         item.addEventListener('click', function () {
             const label = this.getAttribute('data-label');
-            popupTitle.textContent = label;
-            popupDefinition.textContent = definitions[label] || 'ይህ መሣሪያ ገና መግለጫ የለውም።';
-            popupModal.classList.remove('hidden');
+            document.getElementById('popup-title').textContent = label;
+            document.getElementById('popup-definition').textContent =
+                definitions[label] || 'ይህ premium አገልግሎት ነው — ክፍያ በማድረግ ይክፈቱ።';
+            modal.classList.add('open');
         });
     });
 
-    
-
-    closePopup.addEventListener('click', function () {
-        popupModal.classList.add('hidden');
-    });
-
-    // Close popup when clicking outside
-    popupModal.addEventListener('click', function (e) {
-        if (e.target === popupModal) {
-            popupModal.classList.add('hidden');
-        }
-    });
+    closeBtn.addEventListener('click', () => modal.classList.remove('open'));
+    unlockBtn.addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
 });
 </script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const showMoreBtn = document.getElementById("showMoreBtn");
-        if (showMoreBtn) {
-            showMoreBtn.addEventListener("click", function () {
-                document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
-                showMoreBtn.style.display = "none"; // Hide button after showing all rows
-            });
-        }
-    });
-    
-    function toggleFAQ(id) {
-        const faq = document.getElementById(id);
-        if (faq) {
-            faq.classList.toggle("hidden");
-        }
-    }
-</script>
-{% endblock body %}
+{% endblock extra_js %}

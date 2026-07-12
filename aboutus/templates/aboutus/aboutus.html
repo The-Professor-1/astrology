@@ -1,97 +1,83 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}About Us{% endblock title %}
-{% block body %}
 
-<div class="flex flex-wrap ml-20 mt-20 items-center gap-8 p-10">
-    <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-        <h2 class="text-2xl font-bold">sinekewkibt.com</h2>
-        <p class="mt-4">sinekewkibt.com is astrology based website which delivers ancient ethiopians astrology calculation
-            art and algorithm, which is very different from western world astrology calculation technique. additionally this
-            site provides many more features which can calculate and tell about your future and luck.
-        </p>
-    </div>
-    </div>
-    <div class="mt-20">
-        <div class="text-2xl font-bold ml-20 mb-4">FAQ</div>
-        <ul class="space-y-2 w-full lg:w-1/2  ml-40">
-            {% for i,j in faqs%}
-                <li>
-                    <button class="faq-button bg-gray-200 p-3 w-full text-left rounded hover:bg-gray-600 hover:text-white" onclick="toggleFAQ('faq{{ i }}')">{{ i }}</button>
-                    <div id="faq{{ i }}" class="hidden bg-white p-4 ml-10 mt-2 rounded">{{j}}.</div>
-                </li>
+{% block body %}
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>About Us</h2>
+            <p>ጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት — sinekewkibt.com</p>
+        </div>
+
+        <div style="display: grid; gap: 1.5rem; max-width: 48rem; margin: 0 auto 3rem;">
+            <div class="card">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Our Mission</h3>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    sinekewkibt.com delivers ancient Ethiopian astrology calculation art and algorithms —
+                    fundamentally different from Western astrology. Our site provides calculators for your future,
+                    luck, marriage, wealth, and much more.
+                </p>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>FAQ</h2>
+        </div>
+        <div style="max-width: 40rem; margin: 0 auto 3rem;">
+            {% for i, j in faqs %}
+            <div class="accordion-item">
+                <button class="accordion-btn" onclick="toggleFAQ('faq{{ i }}')">{{ i }}</button>
+                <div id="faq{{ i }}" class="accordion-content">{{ j }}</div>
+            </div>
             {% endfor %}
-        </ul>
-    </div>
-    <!-- Text and Image Section -->
-    <div class="flex flex-wrap justify-center items-center gap-8 p-10">
-        <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-            <h2 class="text-2xl font-bold">ስነ-ከዋክብት ምንድን ነው?</h2>
-            <p class="mt-4">ስነ-ከዋክብት ወይም አስትሮሎጂ የፕላኔቶችና የከዋክብትን አቀማመጥ መሰረት ያደረገ: በተለያዩ ወቅቶች የሚወጡ ከዋክብትን በማገጣጠምና 
-              የባህሪ ምሳሌ በመፍጠር የሰዎችን ባህሪ: የህይወት እጣ ፈንታ እንዲሁም ለትዳር:ለኑሮ እና ለስራ የሚስማማቸውን እና የማይስማማቸውን : በተጨማሪም ለተለያዩ የህይወት አጋጣሚዎች ለምሳሌ ሞት በሽታ ሁሉ 
-           ቅድመ ዝግጅት እንድናድርግና ቢገጥሙን ድግሞ እንዴት መወጣት እንደምንችል በዝርዝር የሚያስረዳ ጥበብ ነው:: ይህ ጥበብ ከሀገር ሀገር የሚለያይ ሲሆን
-           ዋናው የሚለይበት ነገር የሰዎችን ኮከብ ለማስላት የሚጠቀሙበት ግብአት ነው:: ለምሳሌ በምእራባውያኑ አለም ኮከብን ለማስላት የሚጠቀሙት ግብአት የትውልድ ወርና ቀንን ሲሆን
-           በኢትዮጽያ ደግሞ የምንጠቀመው ኮከብ የሚሰራለትን ሰው እና የእናቱን መጠሪያ ስም ነው:: ስምን መልአከ ያወጣዋል እንዲሉ አበው በትክክል የሰዎችን ባህሪ የሚገልፀውም በዚሁ
-           በኢትዮጵያውያን ሊቃውንት የተዘጋጀው ቀመር ነው:: በዚህ ድህረ ገፅ የተቀመጠውም ይሄው የስሌት ቀመር ነው::</p>
         </div>
-        <div class="w-full lg:w-1/3">
-          <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
+
+        <div style="display: grid; gap: 1.5rem;">
+            <div class="card" style="max-width: 48rem; margin: 0 auto;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">ስነ-ከዋክብት ምንድን ነው?</h3>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    ስነ-ከዋክብት የፕላኔቶችና የከዋክብትን አቀማመጥ መሰረት ያደረገ ጥበብ ነው —
+                    የሰዎችን ባህሪ፣ የህይወት እጣ ፈንታ፣ ትዳር፣ ኑሮ እና ስራ የሚስማማቸውን ለማወቅ ይረዳል።
+                    በኢትዮጵያ ኮከብን ለማስላት <strong style="color: var(--accent-gold);">ስምና የእናት ስም</strong> መሰረት ይሆናል።
+                </p>
+            </div>
+
+            <div class="card" style="max-width: 48rem; margin: 0 auto;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">የከዋክብት ጥናት ስለ ሀብት፣ ፍቅርና ትዳር</h3>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    ለእያንዳንዱ ኮከብ በግብር የሚገጥሙ የባሕሪ ወገኖች አሉ። ጥንታዊ ኢትዮጵያውያን ስለ ሀብት፣ ፍቅር፣
+                    ትዳር እና ሌሎችም ምርምር አስቀምጠዋል — በ Calculate ገፅ ሁሉንም ማስላት ይቻላል።
+                </p>
+            </div>
+
+            <div class="card" style="max-width: 48rem; margin: 0 auto; border-color: rgba(248,113,113,0.2);">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">⚠️ Disclaimer</h3>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    በዚህ ድህረ ገጽ የተቀመጠው የምርምር ውጤት ትክክለኝነት በማስረጃ ያልተረጋገጠ ሲሆን፤
+                    ድርጅቱ ለማንኛውም ውጤት ሃላፊነት አይወስድም።
+                </p>
+            </div>
+
+            <div class="card" style="max-width: 48rem; margin: 0 auto;">
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">💳 የክፍያ መግለጫ</h3>
+                <p style="color: var(--text-muted); line-height: 1.8;">
+                    Premium አገልግሎቶችን ለመክፈት በ Telebirr ክፍያ ያድርጉ።
+                    ከ Telebirr የሚመጣውን <strong>ሙሉ SMS መልዕክት</strong> በ Calculate ገፅ ያስገቡ —
+                    ፈቃድ በራስ-ሰር ይከፈታል።
+                </p>
+                <a href="{% url 'calculator_list' %}#unlock" class="btn btn-gold" style="margin-top: 1rem;">Unlock Premium</a>
+            </div>
         </div>
-        <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-          <h2 class="text-2xl font-bold">የከዋክብት ጥናት ስለ ሀብት፣ፍቅርና ትዳር እንዲሁም አኗኗር ምን ይላል?</h2>
-          <p class="mt-4">እንደ ስነ-ከዋክብት ጥናት ለእያንዳንዱ ኮከብ በግብር የሚገጥሙ የባሕሪ ወገን የሆኑ ኮከቦች አሉት።
-            ከእነዚህ የባሕሪ ወገኖቹ ውስጥ ደግሞ ከሌሎች ኮከቦች ይበልጥ ቤተ-ክፍሉ
-         የሆነ በባሕሪ የሚገጥም አንድ ኮከብ አለ። ይህ ኮከብም ለፍቅር ወይም ለትዳር ተመራጭ 
-          የሚሆነው ኮከብ ነው።
-            ከዚህ በተጨማሪም ጥንታዊ ኢትዮጵያውያን እንደ ሐሳበ-ሀብት እና መፍትሄ-ሀብት 
-          በመሳሰሉት ጥበብ በተሞላበት ምርምራቸው ስለ ሀብት ጥናት አስቀምጠዋል። እነዚህንና ሌሎችም ስሌቶችን 
-         ራስጌ ላይ ባለው ስሌት ወይም calculate ባሚለው ገፅ ውስጥ በመግባት ማስላት ይቻላል:: ቀመሩ
-          የተዘጋጀ ስለሆነ ከእርስዎ የሚጠበቀው የሚያስፈልጉትን መረጃዎች ብቻ በተዘጋጁ ሳጥኖች ውስጥ መሙላት ነው::</p>
-      </div>
-      <div class="w-full lg:w-1/3">
-        <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
-      </div>
-      <div class="w-full lg:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-        <h2 class="text-2xl font-bold">ማሳሰቢያ፡</h2>
-        <p class="mt-4">በዚህ ድህረ ገጽ የተቀመጠው የምርምር ውጤት ትክክለኝነት በማስረጃ ያልተረጋገጠ ሲሆን፤ የድህረ ገጹ ዋና አላማም ጥናቱን 
-          ለመረጃ ያክል ለአንባቢያን ማድረስ ብቻ ነው፡፡ በዚህ ድህረ ገጽ ላይ በተቀመጠው መረጃ መሰረት ለሚደርሰው ማንኛውም ድርጊትና ውጤት ድርጅቱ
-          ሃላፊነቱን አይወስድም፡፡
-        </p>
     </div>
-    <div class="w-full lg:w-1/3">
-      <img src="{% static 'images/home-big-image.png' %}" alt="Extra Image" class="w-full h-auto rounded-lg shadow-lg">
-    </div>
-    </div>
-    <br>
-    <div class="w-full lg:w-3/4 p-6 bg-white shadow-lg rounded-lg">
-        <h2 class="text-2xl font-bold">የክፍያ መግለጫ</h2>
-        <p class="mt-4">ሰላም እንደምን አላችሁ ውድ የስነ ከዋክብት ቤተሰቦች፣ የክፍያ ሂደቱ ግልፅ አልሆነልንም ባላችሁን መሰረት ሁሉንም ደረጃዎች እንደሚከተለው በፎቶ አስቀምጠናቸዋል፡፡ በተረፈ ያላችሁን ሀሳብም ሆነ አስተያየት (contact us) በሚለው ገፅ ይላኩልን፡፡ ስለምትከታተሉን እናመሰግናለን።
-        </p>
-    </div>
-    
-<div class="flex flex-wrap bg-gray-700 justify-center mt-20 gap-2 p-10 md:flex-nowrap">
-    <img src="{% static 'photo_1.jpg' %}" alt="Photo 1" class="w-full max-w-[200px] h-auto object-cover md:w-auto">
-    <img src="{% static 'photo_2.jpg' %}" alt="Photo 2" class="w-full max-w-[200px] h-auto object-cover md:w-auto">
-    <img src="{% static 'photo_3.jpg' %}" alt="Photo 3" class="w-full max-w-[200px] h-auto object-cover md:w-auto">
-    <img src="{% static 'photo_4.jpg' %}" alt="Photo 4" class="w-full max-w-[200px] h-auto object-cover md:w-auto">
-    <img src="{% static 'photo_5.jpg' %}" alt="Photo 5" class="w-full max-w-[200px] h-auto object-cover md:w-auto">
-</div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const showMoreBtn = document.getElementById("showMoreBtn");
-            if (showMoreBtn) {
-                showMoreBtn.addEventListener("click", function () {
-                    document.querySelectorAll("tbody tr.hidden").forEach(row => row.classList.remove("hidden"));
-                    showMoreBtn.style.display = "none"; // Hide button after showing all rows
-                });
-            }
-        });
-        
-        function toggleFAQ(id) {
-            const faq = document.getElementById(id);
-            if (faq) {
-                faq.classList.toggle("hidden");
-            }
-        }
-    </script>
+</section>
 {% endblock body %}
+
+{% block extra_js %}
+<script>
+function toggleFAQ(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+}
+</script>
+{% endblock extra_js %}

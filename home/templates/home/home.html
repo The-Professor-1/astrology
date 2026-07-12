@@ -1,155 +1,208 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    {% block title %}
-    <title>Home</title>
-    {% endblock title %}
-    <!-- Include Font Awesome for the Like icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
+{% block title %}Home{% endblock title %}
+
 {% block body %}
-<body class="">
-    <!-- Full-width, full-height image with overlay -->
-    <div class="relative w-full h-96 lg:h-screen pt-16">
-      <img src="{% static 'images/home-big-image.png' %}" alt="Background Image" class="w-full h-full object-cover">
-      <div class="absolute inset-0 bg-black opacity-50"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-4">
-          <h1 class="lg:text-7xl text-4xl font-bold">ወፍካሬ-ከዋክብት</h1>
-          <p class="text-lg lg:text-4xl mt-2">የጥንታዊ ኢትዮጵያውያን ሊቃውንቶችና ጠበብቶች የምርምር ውጤት</p><br>
-          <a href="{% url 'calculator_list'%}"><button class="bg-blue-600 p-2 text-l text-white w-660 border-2 border-blue-400 rounded-lg hover:bg-blue-900 hover:scale-105 hover:text-white">ኮከብዎን ለማስላት ይሄን ይጫኑ</button>
-          </a>
-      </div>
-      
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-stars"></div>
+    <div class="container" style="position: relative;">
+        <div class="hero-badge">✦ ጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት</div>
+        <h1>
+            <span class="highlight">ወፍካሬ-ከዋክብት</span><br>
+            የሊቃውንት ምርምር ውጤት
+        </h1>
+        <p class="hero-sub">
+            የጥንታዊ ኢትዮጵያውያን ሊቃውንትና ጠበብቶች የተዘጋጀው የስነ-ከዋክብት ቀመር —
+            ስምና የእናት ስም በመሰረት ኮከብዎን፣ እድልዎን እና ትንቢትዎን ይወቁ።
+        </p>
+        <div class="hero-actions">
+            <a href="{% url 'calculate' %}" class="btn btn-gold">ኮከብዎን ለማስላት</a>
+            <a href="{% url 'calculator_list' %}" class="btn btn-outline">ሁሉንም አገልግሎቶች</a>
+        </div>
     </div>
+</section>
 
-    <!-- Four Rounded Squares -->
-    <div class="flex flex-wrap justify-center gap-6 p-10">
-        <div class="w-32 h-8 lg:w-48 lg:h-12 flex items-center justify-center rounded-lg hover:bg-gray-900 bg-gray-700 text-white p-4 border border-gray-400">Content 1</div>
-        <div class="w-32 h-8 lg:w-48 lg:h-12 flex items-center justify-center rounded-lg hover:bg-gray-900 bg-gray-700 text-white p-4 border border-gray-400">Content 2</div>
-        <div class="w-32 h-8 lg:w-48 lg:h-12 flex items-center justify-center rounded-lg hover:bg-gray-900 bg-gray-700 text-white p-4 border border-gray-400">Content 3</div>
-        <div class="w-32 h-8 lg:w-48 lg:h-12 flex items-center justify-center rounded-lg hover:bg-gray-900 bg-gray-700 text-white p-4 border border-gray-400">Content 4</div>
-        <div class="w-32 h-8 lg:w-48 lg:h-12 flex items-center justify-center rounded-lg hover:bg-gray-900 bg-gray-700 text-white p-4 border border-gray-400">Content 5</div>
+<!-- Features -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>ምን ልናገርዎ?</h2>
+            <p>ከ 15+ የተለያዩ ስሌቶች — ኮከብ፣ ሀብት፣ ትዳር፣ ፍቅር እና ትንቢት</p>
+        </div>
+        <div class="feature-grid">
+            <a href="{% url 'calculate' %}" class="feature-card">
+                <div class="feature-icon">⭐</div>
+                <h3>ኮከብ ስሌት</h3>
+                <p>ስምና የእናት ስም በመሰረት የእርስዎን ኮከብ ይወቁ — ነፃ!</p>
+            </a>
+            <a href="{% url 'calculator_list' %}" class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>የሀብት እጣ ፈንታ</h3>
+                <p>የሀብት እድልዎን እና ጥሩ ጊዜዎችን ይፈልጉ።</p>
+            </a>
+            <a href="{% url 'calculator_list' %}" class="feature-card">
+                <div class="feature-icon">💍</div>
+                <h3>ትዳር &amp; ፍቅር</h3>
+                <p>የትዳር በረከት፣ ፍቅር ትንቢት እና ትዳር ቆይታ።</p>
+            </a>
+            <a href="{% url 'calculator_list' %}" class="feature-card">
+                <div class="feature-icon">🔮</div>
+                <h3>ትንቢት</h3>
+                <p>ፅንስ፣ በሽታ፣ ፍርድ፣ ጦርነት እና ሌሎች ትንቢቶች።</p>
+            </a>
+        </div>
     </div>
-    <br>
+</section>
 
-    <!-- Post Form (unchanged) -->
-    <center>
-    {% if admin == 1 %}
-    <a href="{% url 'blog:dashboard' %}"><div class="w-1/2 p-4 border bg-green-700 text-4xl text-white font-sans rounded-lg">Goto Admin Dashboard</div></a><br>
-    <form method="POST" enctype="multipart/form-data" class="bg-white lg:w-1/2 shadow-md p-4 rounded-lg mb-4">
-        {% csrf_token %}
-        <textarea name="text" class="w-full p-2 border rounded-md" placeholder="Write something..." style="white-space: pre-line;"></textarea>
-        
-        <!-- Hidden file input -->
-        <input type="file" name="images" accept="image/*" multiple class="hidden" id="file-input">
-        
-        <!-- Image upload trigger -->
-        <label for="file-input" class="cursor-pointer mt-2 inline-block">
-            <img src="{% static 'images/imageicon.png' %}" alt="Upload" class="w-6 h-6">
-        </label>
-        
-        <!-- Image preview container -->
-        <div id="image-preview" class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4"></div>
-        
-        <button type="submit" name="action" value="post_button" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Post</button>
-    </form>
-    {% endif %}
-    <br>
-     
-    <!-- Posts Section -->
-    <div class="w-[90%] lg:w-1/2 mx-auto mt-6">
+<!-- How it works -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="section-header">
+            <h2>እንዴት ይሠራል?</h2>
+            <p>ሶስት ቀላል ደረጃዎች</p>
+        </div>
+        <div class="steps-grid">
+            <div class="card step-card">
+                <div class="step-num">1</div>
+                <h3>መመዝገብ</h3>
+                <p>ነፃ መለያ ይፍጠሩ እና ይግቡ።</p>
+            </div>
+            <div class="card step-card">
+                <div class="step-num">2</div>
+                <h3>ኮከብ ስላት</h3>
+                <p>ስምና የእናት ስም በአማርኛ ያስገቡ — ኮከብዎን ይወቁ።</p>
+            </div>
+            <div class="card step-card">
+                <div class="step-num">3</div>
+                <h3>Premium ይክፈቱ</h3>
+                <p>በ Telebirr ክፍያ ያድርጉ — ፈቃድ በራስ-ሰር ይከፈታል።</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">15+</div>
+                <div class="stat-label">የስሌት አይነቶች</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">12</div>
+                <div class="stat-label">ኮከቦች</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">∞</div>
+                <div class="stat-label">የጥንት ጥበብ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Online Access</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About snippet -->
+<section class="section" style="padding-top: 0;">
+    <div class="container">
+        <div class="card" style="max-width: 48rem; margin: 0 auto; text-align: center;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">ስነ-ከዋክብት ምንድን ነው?</h2>
+            <p style="color: var(--text-muted); line-height: 1.8;">
+                በምዕራባውያን ዓለም ኮከብን ለማስላት የትውልድ ቀንና ወር ይጠቀማሉ —
+                በኢትዮጵያ ግን <strong style="color: var(--accent-gold);">ስምና የእናት ስም</strong> መሰረት ይሆናል።
+                ይህ ጥንታዊ ቀመር የሰዎችን ባህሪ፣ እድል፣ ትዳር እና ህይወት ጥናት ይሰጣል።
+            </p>
+            <a href="{% url 'aboutus' %}" class="btn btn-outline" style="margin-top: 1.5rem;">ተጨማሪ ይወቁ</a>
+        </div>
+    </div>
+</section>
+
+<!-- Community feed -->
+<section class="feed-section">
+    <div class="container" style="max-width: 40rem;">
+        <div class="section-header">
+            <h2>Community</h2>
+            <p>ከቡድናችን ጋር ይገናኙ</p>
+        </div>
+
+        {% if admin == 1 %}
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{% url 'blog:dashboard' %}" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Admin Dashboard</a>
+            <form method="POST" enctype="multipart/form-data" class="card">
+                {% csrf_token %}
+                <textarea name="text" class="form-textarea" placeholder="Write something..." style="min-height: 5rem;"></textarea>
+                <input type="file" name="images" accept="image/*" multiple class="hidden" id="file-input">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem;">
+                    <label for="file-input" class="btn btn-outline btn-sm" style="cursor: pointer;">📷 Add photos</label>
+                    <button type="submit" name="action" value="post_button" class="btn btn-primary btn-sm">Post</button>
+                </div>
+                <div id="image-preview" class="post-images" style="margin-top: 0.75rem;"></div>
+            </form>
+        </div>
+        {% endif %}
+
         {% for post in posts %}
-        <div class="bg-white shadow-md p-4 rounded-lg mb-4">
-            <div class="border rounded-[50%] -ml-[80%] w-10 h-10 border-black">
-                <img class="rounded-[50%] h-auto w-full" src="{% static 'favicon.png' %}">
-            </div><div class="text-xl text-gray-800 -ml-[45%] lg:-ml-[60%] -mt-10">Admin</div><br>
-            <div class="text-[12px] text-gray-500 italic -ml-[47%] lg:-ml-[60%] -mt-8 dateDiv">
-            </div><br><br>
-            <p style="white-space: pre-line;">{{ post.text }}</p>
+        <article class="post-card">
+            <div class="post-header">
+                <div class="post-avatar">A</div>
+                <div class="post-meta">
+                    <div class="post-author">Admin</div>
+                    <div class="post-date dateDiv">{{ post.created_at|date:"d M Y" }}</div>
+                </div>
+            </div>
+            <div class="post-text">{{ post.text }}</div>
             {% if post.images.all %}
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+            <div class="post-images">
                 {% for image in post.images.all %}
-                    <div class="w-full h-32 lg:h-48 relative overflow-hidden rounded-lg">
-                        <img  src="{{ image.image.url }}" class="w-full h-full object-cover" alt="Post Image">
-                    </div>
+                <img src="{{ image.image.url }}" alt="Post image">
                 {% endfor %}
             </div>
             {% endif %}
-            <!-- Delete Button (Visible only to admin or post creator) -->
             {% if admin == 1 or request.user == post.user %}
-            <form method="POST" action="{% url 'delete_post' post.id %}" class="inline">
-            {% csrf_token %}
-            <button type="submit" class="text-red-500 hover:text-red-700">Delete Post</button>
+            <form method="POST" action="{% url 'delete_post' post.id %}" style="margin-bottom: 0.75rem;">
+                {% csrf_token %}
+                <button type="submit" class="post-action-btn" style="color: var(--error);">Delete</button>
             </form>
             {% endif %}
-            <div class="mt-2 flex justify-between">
-                <!-- Like Button with Facebook Icon -->
-                <button class="like-btn text-gray-500 hover:text-blue-600" data-post-id="{{ post.id }}">
-                    Likes (<span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>)
+            <div class="post-actions">
+                <button class="post-action-btn like-btn" data-post-id="{{ post.id }}">
+                    ♥ Likes (<span id="like-count-{{ post.id }}">{{ post.likes.count }}</span>)
                 </button>
-                <!-- Comment Trigger -->
-                <span class="text-gray-500 cursor-pointer comment-toggle" data-post-id="{{ post.id }}">
-                    Comment (<span id="comment-count-{{ post.id }}">{{ post.comments.count }}</span>)
-                </span>
+                <button class="post-action-btn comment-toggle" data-post-id="{{ post.id }}">
+                    💬 Comments (<span id="comment-count-{{ post.id }}">{{ post.comments.count }}</span>)
+                </button>
             </div>
-
-            <!-- Comments Section -->
-            <div id="comments-section-{{ post.id }}" class="mt-4 hidden">
-                <!-- Comment Form (Hidden Initially) -->
-                <form class="comment-form" data-post-id="{{ post.id }}">
+            <div id="comments-section-{{ post.id }}" class="comments-section hidden">
+                <form class="comment-form" data-post-id="{{ post.id }}" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
                     {% csrf_token %}
-                    <input type="text" name="text" placeholder="Add a comment..." class="border p-1 w-3/4">
-                    <button type="submit" class="bg-green-500 text-white px-2 py-1">Comment</button>
+                    <input type="text" name="text" placeholder="Add a comment..." class="form-input" style="flex: 1;">
+                    <button type="submit" class="btn btn-primary btn-sm">Post</button>
                 </form>
-
                 {% for comment in post.comments.all %}
-                <div class="p-2 border rounded my-2">
+                <div class="comment-item">
                     <strong>{{ comment.user.username }}</strong>: {{ comment.text }}
-                    <small class="text-gray-500">{{ comment.created_at }}</small>
-
-                    <!-- Edit/Delete Options (Admin or Comment Owner) -->
+                    <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">{{ comment.created_at }}</small>
                     {% if admin == 1 or request.user == comment.user %}
-                    <div class="text-sm mt-1">
-                        <button class="text-blue-500 edit-comment" data-comment-id="{{ comment.id }}">Edit</button>
-                        <form class="delete-comment inline" method="POST" action="/delete_comment/{{ comment.id }}/">
-                            {% csrf_token %}
-                            <button type="submit" class="text-red-500">Delete</button>
-                        </form>
-                    </div>
+                    <form class="delete-comment" method="POST" action="/delete_comment/{{ comment.id }}/" style="margin-top: 0.25rem;">
+                        {% csrf_token %}
+                        <button type="submit" class="post-action-btn" style="color: var(--error); font-size: 0.75rem;">Delete</button>
+                    </form>
                     {% endif %}
-
-                    <!-- Reply Trigger -->
-                    <div class="ml-4 mt-2">
-                        <span class="text-gray-500 cursor-pointer reply-toggle" data-comment-id="{{ comment.id }}">Reply</span>
-                        <!-- Reply Form (Hidden Initially) -->
-                        <form class="reply-form hidden" data-comment-id="{{ comment.id }}">
+                    <div style="margin-top: 0.5rem;">
+                        <span class="post-action-btn reply-toggle" data-comment-id="{{ comment.id }}" style="cursor: pointer;">Reply</span>
+                        <form class="reply-form hidden" data-comment-id="{{ comment.id }}" style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
                             {% csrf_token %}
-                            <input type="text" name="text" placeholder="Reply..." class="border p-1 w-3/4">
-                            <button type="submit" class="bg-blue-500 text-white px-2 py-1">Reply</button>
+                            <input type="text" name="text" placeholder="Reply..." class="form-input" style="flex: 1;">
+                            <button type="submit" class="btn btn-outline btn-sm">Reply</button>
                         </form>
-
-                        <!-- Replies -->
-                        <div id="replies-{{ comment.id }}" class="mt-2">
+                        <div id="replies-{{ comment.id }}">
                             {% for reply in comment.replies.all %}
-                            <div class="ml-4 p-1 border rounded">
+                            <div class="comment-item" style="margin-left: 1rem; margin-top: 0.5rem;">
                                 <strong>{{ reply.user.username }}</strong>: {{ reply.text }}
-                                <small class="text-gray-500">{{ reply.created_at }}</small>
-                                <!-- Edit/Delete Options (Admin or Reply Owner) -->
-                                {% if admin == 1 or request.user == reply.user %}
-                                <div class="text-sm mt-1">
-                                    <button class="text-blue-500 edit-reply" data-reply-id="{{ reply.id }}">Edit</button>
-                                    <form class="delete-reply inline" method="POST" action="/delete_reply/{{ reply.id }}/">
-                                        {% csrf_token %}
-                                        <button type="submit" class="text-red-500">Delete</button>
-                                    </form>
-                                </div>
-                                {% endif %}
                             </div>
                             {% endfor %}
                         </div>
@@ -157,183 +210,79 @@
                 </div>
                 {% endfor %}
             </div>
+        </article>
+        {% empty %}
+        <div class="card" style="text-align: center; color: var(--text-muted);">
+            No posts yet. Check back soon!
         </div>
         {% endfor %}
     </div>
-    </center>
+</section>
+{% endblock body %}
 
-    <!-- JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function getFormattedDate() {
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, '0'); // Ensure 2-digit day
-            const month = months[now.getMonth()]; // Get month abbreviation
-            const year = now.getFullYear(); // Get full year
-            
-            return `${day}-${month}-${year}`;
-        }
-            function updateDateDivs() {
-    document.querySelectorAll('.dateDiv').forEach(div => {
-        div.innerText = getFormattedDate();
-    });
-}
-    updateDateDivs();
-
-    $(document).ready(function () {
-        // Toggle Comment Form
-        $(".comment-toggle").click(function () {
-            let post_id = $(this).data("post-id");
-            $(`#comments-section-${post_id}`).toggleClass("hidden");
-        });
-
-        // Toggle Reply Form
-        $(".reply-toggle").click(function () {
-            let comment_id = $(this).data("comment-id");
-            $(`.reply-form[data-comment-id="${comment_id}"]`).toggleClass("hidden");
-        });
-
-        // Submit Comment via AJAX
-        $(".comment-form").submit(function (e) {
-            e.preventDefault();
-            let post_id = $(this).data("post-id");
-            let text = $(this).find("input[name='text']").val();
-            let csrf_token = $("input[name='csrfmiddlewaretoken']").val();
-
-            $.ajax({
-                type: "POST",
-                url: `/comment/${post_id}/`,
-                data: {
-                    text: text,
-                    csrfmiddlewaretoken: csrf_token
-                },
-                success: function (response) {
-    let commentHtml = `
-        <div class="p-2 border rounded my-2">
-            <strong>${response.user}</strong>: ${response.text}
-            <small class="text-gray-500">${response.created_at}</small>
-            <div class="ml-4 mt-2">
-                <span class="text-gray-500 cursor-pointer reply-toggle" data-comment-id="${response.id}">Reply</span>
-                <form class="reply-form hidden" data-comment-id="${response.id}">
-                    <input type="text" name="text" placeholder="Reply..." class="border p-1 w-3/4">
-                    <button type="submit" class="bg-blue-500 text-white px-2 py-1">Reply</button>
-                </form>
-                <div id="replies-${response.id}"></div>
-            </div>
-        </div>
-    `;
-    $(`#comments-section-${post_id}`).append(commentHtml);
-
-    // Update the comment count
-    let commentCount = parseInt($(`#comment-count-${post_id}`).text());
-    $(`#comment-count-${post_id}`).text(commentCount + 1);
-
-    // Clear the input field and hide the form
-    $(`.comment-form[data-post-id="${post_id}"] input[name='text']`).val("");
-    $(`#comments-section-${post_id}`).removeClass("hidden");
-}
-            });
-        });
-
-        // Submit Reply via AJAX
-        $(document).on("submit", ".reply-form", function (e) {
-            e.preventDefault();
-            let comment_id = $(this).data("comment-id");
-            let text = $(this).find("input[name='text']").val();
-            let csrf_token = $("input[name='csrfmiddlewaretoken']").val();
-
-            $.ajax({
-                type: "POST",
-                url: `/reply/${comment_id}/`,
-                data: {
-                    text: text,
-                    csrfmiddlewaretoken: csrf_token
-                },
-                success: function (response) {
-                    let replyHtml = `
-                        <div class="ml-4 p-1 border rounded">
-                            <strong>${response.user}</strong>: ${response.text}
-                            <small class="text-gray-500">${response.created_at}</small>
-                        </div>
-                    `;
-                    $(`#replies-${comment_id}`).append(replyHtml);
-                    $(`.reply-form[data-comment-id="${comment_id}"] input[name='text']`).val("");
-                    $(`.reply-form[data-comment-id="${comment_id}"]`).addClass("hidden");
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('file-input');
+    const imagePreview = document.getElementById('image-preview');
+    if (fileInput && imagePreview) {
+        fileInput.addEventListener('change', function () {
+            imagePreview.innerHTML = '';
+            for (const file of this.files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        imagePreview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
                 }
-            });
+            }
         });
-
-        // Like Button Toggle
-        
-$(".like-btn").click(function () {
-    let post_id = $(this).data("post-id");
-    let $likeCount = $(`#like-count-${post_id}`);
-
-    $.ajax({
-        type: "POST",
-        url: `/like/${post_id}/`,
-        data: {
-            csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").val()
-        },
-        success: function (response) {
-            // Update the like count dynamically
-            $likeCount.text(response.count);
-        },
-        error: function (xhr, status, error) {
-            console.error("Error liking the post:", error);
-        }
-    });
+    }
 });
 
-        // Edit Comment (Placeholder - Implement server-side logic)
-        $(".edit-comment").click(function () {
-            let comment_id = $(this).data("comment-id");
-            alert("Edit comment functionality for ID " + comment_id + " not implemented yet.");
-            // Add logic to fetch and edit comment via AJAX
-        });
-
-        // Edit Reply (Placeholder - Implement server-side logic)
-        $(".edit-reply").click(function () {
-            let reply_id = $(this).data("reply-id");
-            alert("Edit reply functionality for ID " + reply_id + " not implemented yet.");
-            // Add logic to fetch and edit reply via AJAX
+$(document).ready(function () {
+    $(".comment-toggle").click(function () {
+        $(`#comments-section-${$(this).data("post-id")}`).toggleClass("hidden");
+    });
+    $(".reply-toggle").click(function () {
+        $(`.reply-form[data-comment-id="${$(this).data("comment-id")}"]`).toggleClass("hidden");
+    });
+    $(".comment-form").submit(function (e) {
+        e.preventDefault();
+        const post_id = $(this).data("post-id");
+        $.post(`/comment/${post_id}/`, {
+            text: $(this).find("input[name='text']").val(),
+            csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").first().val()
+        }, response => {
+            $(`#comments-section-${post_id}`).append(
+                `<div class="comment-item"><strong>${response.user}</strong>: ${response.text}</div>`
+            );
+            $(`#comment-count-${post_id}`).text(parseInt($(`#comment-count-${post_id}`).text()) + 1);
+            $(this).find("input[name='text']").val("");
         });
     });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const fileInput = document.getElementById('file-input');
-            const imagePreview = document.getElementById('image-preview');
-        
-            fileInput.addEventListener('change', function () {
-                // Clear previous previews
-                imagePreview.innerHTML = '';
-        
-                // Loop through selected files
-                const files = this.files;
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            const imgContainer = document.createElement('div');
-                            imgContainer.className = 'w-full h-32 lg:h-48 relative overflow-hidden rounded-lg';
-                            
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.className = 'w-full h-full object-cover'; // Fill container
-                            img.alt = 'Preview';
-        
-                            imgContainer.appendChild(img);
-                            imagePreview.appendChild(imgContainer);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                }
-            });
+    $(document).on("submit", ".reply-form", function (e) {
+        e.preventDefault();
+        const cid = $(this).data("comment-id");
+        $.post(`/reply/${cid}/`, {
+            text: $(this).find("input[name='text']").val(),
+            csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").first().val()
+        }, response => {
+            $(`#replies-${cid}`).append(`<div class="comment-item" style="margin-left:1rem"><strong>${response.user}</strong>: ${response.text}</div>`);
+            $(this).find("input[name='text']").val("");
+            $(this).addClass("hidden");
         });
-        </script>
-{% endblock %}
-</body>
-</html>
+    });
+    $(".like-btn").click(function () {
+        const post_id = $(this).data("post-id");
+        $.post(`/like/${post_id}/`, { csrfmiddlewaretoken: $("input[name='csrfmiddlewaretoken']").first().val() },
+            response => $(`#like-count-${post_id}`).text(response.count));
+    });
+});
+</script>
+<style>.hidden { display: none !important; }</style>
+{% endblock extra_js %}

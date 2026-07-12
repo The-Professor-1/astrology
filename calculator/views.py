@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect  # type:ignore
 from django.http import HttpResponse, HttpResponseForbidden  # type:ignore
 from django.contrib import messages  # type:ignore
 from django.urls import reverse  # type:ignore
+from django.conf import settings  # type:ignore
 from calculator import library as lb
+from calculator.payment import verify_and_process_payment
 from .forms import RegisterForm, GeneralForm
 from .models import Users, Message_After_Transaction
 from home.models import User, UserProfile, TransactionNumber, SiteStats
@@ -32,51 +34,62 @@ def profile_permission_required(view_func):
             request.session['status'] = status
         
         if status != 'allowed':
-            return HttpResponse(
-                "<center><font color='red'><h1>ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም፡፡</h1><br><br></font>"
-                f"<a href='{reverse('nameandnosender')}'><font color='blue'><h2>ፈቃድ ለማግኘት</h2></font></a></center>"
-            )
+            messages.warning(request, 'ይህን አገልግሎት ለማግኘት ፈቃድ የሎትም።')
+            return redirect(reverse('calculator_list') + '#unlock')
         
         return view_func(request, *args, **kwargs)
     
     return _wrapped_view
 
 def nameandnosender(request):
-    if request.method == 'POST':
-        if not request.user.is_authenticated:
-            return redirect("login")
-        action = request.POST.get('action')
-        
-        if action == 'send_nameandnumber':
-            name = request.POST.get('username')
-            if name == 'professor':
-                return HttpResponse(
-                    f"<center><h1><font color='blue'>እርስዎ የድርጅቱ ባለቤት ስልሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም፡፡</font></h1><br>"
-                    f"<font color='blue'><h2><a href='{reverse('calculator_list')}'>ወደ ዋናው ገፅ ለመመለስ</a></h2></font></center>"
-                )
-            number = request.POST.get('transaction_number')
-            profile = UserProfile.objects.get(user=request.user)
-            status = profile.status
-            trno = TransactionNumber.objects.filter(transaction_number=number)
-            if (len(trno) == 0) and (status == 'denied'):
-                try:
-                    trno = TransactionNumber(transaction_number=number)
-                    trno.save()
-                    item = Message_After_Transaction(username=name, transaction_number=number, status=status)
-                    item.save()
-                    return HttpResponse(
-                        f"<center><font color='green'><h1>መልዕክትዎ ተልኳል ውጤቱን ይጠብቁ፡፡</h1><br><br></font>"
-                        f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
-                    )
-                except Exception as e:
-                    messages.error(request, f"An error occurred: {str(e)}")
-                    return HttpResponse(f'<h1>ስህተት አለ፡ {str(e)}</h1>')
-            else:
-                return HttpResponse(
-                    f"<center><font color='red'><h1>የመረጃ ስህተት አለ፡፡ እንደገና ይሞክሩ፡፡</h1><br><br></font>"
-                    f"<a href='{reverse('calculator_list')}'><font color='blue'><h2>ወደ ዋናው ገፅ ለመመለስ</font></h2></a></center>"
-                )
-    return HttpResponse('<h1>Invalid request</h1>')
+    if request.method != 'POST':
+        return redirect('calculator_list')
+
+    if not request.user.is_authenticated:
+        messages.error(request, 'ክፍያ ለማረጋገጥ መጀመሪያ መመዝገብ ወይም መግባት አለብዎት።')
+        return redirect('login')
+
+    action = request.POST.get('action')
+    if action != 'send_nameandnumber':
+        return redirect('calculator_list')
+
+    username = request.user.username
+    if username == 'professor':
+        messages.info(request, 'እርስዎ የድርጅቱ ባለቤት ስለሆኑ ፈቃድ መጠየቅ አያስፈልግዎትም።')
+        return redirect('calculator_list')
+
+    receipt_text = (request.POST.get('telebirr_receipt_text') or '').strip()
+    if not receipt_text:
+        messages.error(request, 'እባክዎ ከቴሌብር የተላከውን ሙሉ መልዕክት ይጽፉ።')
+        return redirect(reverse('calculator_list') + '#unlock')
+
+    profile = UserProfile.objects.get(user=request.user)
+    if profile.status == 'allowed':
+        messages.info(request, 'አስቀድመው ፈቃድ አለዎት — ሁሉንም አገልግሎቶች መጠቀም ይችላሉ።')
+        return redirect('calculator_list')
+
+    used_refs = set(TransactionNumber.objects.values_list('transaction_number', flat=True))
+    result = verify_and_process_payment(receipt_text, used_refs)
+
+    if not result['success']:
+        messages.error(request, result['message'])
+        return redirect(reverse('calculator_list') + '#unlock')
+
+    reference = result['reference']
+    TransactionNumber.objects.create(transaction_number=reference)
+    profile.status = 'allowed'
+    profile.save()
+    request.session['status'] = 'allowed'
+    request.session.modified = True
+
+    Message_After_Transaction.objects.create(
+        username=username,
+        transaction_number=reference,
+        status='allowed',
+    )
+
+    messages.success(request, result['message'])
+    return redirect('calculator_list')
 
 # Updated calculate_sum with type checking
 def calculate_sum(name, modulus, fidel_pairs):
@@ -323,7 +336,13 @@ def calculators_list(request):
     admin = request.session.get('admin', 0)
     status = request.session.get('status', '')
     return render(request, 'calculator/calculator_list.html', {
-        'urls': urls, 'admin': admin, 'status': status, 'calculators_list_visit': stats.calculators_list_visits
+        'urls': urls,
+        'admin': admin,
+        'status': status,
+        'calculators_list_visit': stats.calculators_list_visits,
+        'telebirr_holder': settings.TELEBIRR_ACCOUNT_HOLDER,
+        'telebirr_number': settings.TELEBIRR_ACCOUNT_NUMBER,
+        'telebirr_amount': settings.TELEBIRR_PAYMENT_AMOUNT,
     })
 
 @profile_permission_required

@@ -1,88 +1,113 @@
 {% load widget_tweaks %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="am">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% block title %}{% endblock title %}
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="ወፍካሬ-ከዋክብት — ጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት ስሌት እና ትንቢት">
+    <title>{% block title %}ስነ-ከዋክብት{% endblock title %} | kokeb.com</title>
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.png' %}">
-    <style>
-        .nav-link {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: -4px;
-            width: 100%;
-            height: 2px;
-            background-color: transparent;
-            transition: background-color 0.3s ease;
-        }
-        .nav-link:hover::after, .nav-link.active::after {
-            background-color: #229c2c;
-        }
-        .nav-link.active {
-            color: #18a536;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_head %}{% endblock extra_head %}
 </head>
-<body class="bg-gray-100">
-    <header>
-        <nav class="bg-white fixed top-0 left-0 shadow-lg z-50 text-gray-700 p-4 w-full">
-            <div class="container mx-auto flex justify-between items-center">
-                <a href="{% url 'home' %}"><div class="text-2xl lg:text-4xl font-bold" id="logo">ስነ-ከዋክብት</div></a>
-                <div id="loginandregisterbuttons">
-                    {% if user.is_authenticated %}
-                        <span class="mr-4">Hello, {{ user.username }}</span>
-                        <a href="{% url 'logout' %}" class="text-white border-2 border-gray-700 bg-gray-700 px-4 py-2 rounded">Logout</a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="text-white bg-gray-700 px-4 py-2 border-2 border-gray-700 rounded">Login</a>
-                        <a href="{% url 'register' %}" class="text-gray-700 border-2 border-gray-700 px-4 py-2 rounded">Register</a>
-                    {% endif %}
-                </div>
-                <button id="menu-button" class="lg:hidden focus:outline-none">
-                    <div class="space-y-1">
-                        <span class="block w-6 h-1 bg-gray-700"></span>
-                        <span class="block w-6 h-1 bg-gray-700"></span>
-                        <span class="block w-6 h-1 bg-gray-700"></span>
-                    </div>
-                </button>
-                <ul id="menus" class="hidden lg:mt-0 lg:flex space-x-8 text-lg">
-                    <li><a href="{% url 'home' %}" class="nav-link" id="nav-home">Home</a></li>
-                    <li><a href="{% url 'calculator_list' %}" class="nav-link" id="nav-calculate">Calculate</a></li>
-                    <li><a href="{% url 'contact:contact' %}" class="nav-link" id="nav-contact">Contact Us</a></li>
-                    <li><a href="{% url 'aboutus' %}" class="nav-link" id="nav-dashboard">About Us</a></li>
-                </ul>
-               
-            </div>
-        </nav>
-    </header>
-    
-    {% block body %}{% endblock body %}
-    
-    <footer class="bg-gray-800 text-gray-300 text-center text-lg py-4 mt-16">
-        &copy; 2025 kokeb.com, All rights reserved.
-    </footer>
-    
-    <script>
-        document.getElementById('menu-button').addEventListener('click', function() {
-            document.getElementById('menus').classList.toggle('hidden');
-            document.getElementById('loginandregisterbuttons').classList.toggle('hidden');
-        });
+<body>
+    <header class="site-nav">
+        <div class="container nav-inner">
+            <a href="{% url 'home' %}" class="logo">ስነ-ከዋክብት</a>
 
-        // Highlight active link
-        const currentPage = window.location.pathname;
-        document.querySelectorAll('.nav-link').forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
+            <ul class="nav-links" id="desktop-nav">
+                <li><a href="{% url 'home' %}" class="nav-link" data-path="/">Home</a></li>
+                <li><a href="{% url 'calculator_list' %}" class="nav-link" data-path="/calculator/calculators/">Calculate</a></li>
+                <li><a href="{% url 'aboutus' %}" class="nav-link" data-path="/aboutus/">About</a></li>
+                <li><a href="{% url 'contact:contact' %}" class="nav-link" data-path="/contact/">Contact</a></li>
+            </ul>
+
+            <div class="nav-auth" id="desktop-auth">
+                {% if user.is_authenticated %}
+                    <span class="nav-user">ሰላም, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-outline btn-sm">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline btn-sm">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Register</a>
+                {% endif %}
+            </div>
+
+            <button class="menu-toggle" id="menu-button" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="{% url 'home' %}" class="nav-link">Home</a>
+        <a href="{% url 'calculator_list' %}" class="nav-link">Calculate</a>
+        <a href="{% url 'aboutus' %}" class="nav-link">About</a>
+        <a href="{% url 'contact:contact' %}" class="nav-link">Contact</a>
+        <div class="nav-auth-mobile">
+            {% if user.is_authenticated %}
+                <span class="nav-user">ሰላም, {{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="btn btn-outline">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-primary">Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <main class="page-wrap">
+        {% if messages %}
+        <div class="container" style="padding-top: 1rem;">
+            {% for message in messages %}
+            <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% else %}alert-info{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% block body %}{% endblock body %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="{% url 'home' %}" class="logo">ስነ-ከዋክብት</a>
+                <p>ጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት — የሊቃውንትና ጠበብት ምርምር ውጤት በዘመናዊ ቴክኖሎጂ።</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navigate</h4>
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'calculator_list' %}">Calculators</a>
+                <a href="{% url 'aboutus' %}">About Us</a>
+                <a href="{% url 'contact:contact' %}">Contact</a>
+            </div>
+            <div class="footer-links">
+                <h4>Services</h4>
+                <a href="{% url 'calculate' %}">ኮከብ ስሌት</a>
+                <a href="{% url 'calculator_list' %}">Premium Calculators</a>
+                <a href="{% url 'register' %}">Create Account</a>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            &copy; 2026 kokeb.com — All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+        }
+
+        const path = window.location.pathname;
+        document.querySelectorAll('.nav-link[data-path]').forEach(link => {
+            const dp = link.getAttribute('data-path');
+            if (dp === '/' ? path === '/' || path === '/home/' : path.startsWith(dp)) {
                 link.classList.add('active');
             }
         });
     </script>
+    {% block extra_js %}{% endblock extra_js %}
 </body>
 </html>
