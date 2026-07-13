@@ -40,10 +40,10 @@
     </header>
 
     <div class="mobile-menu" id="mobile-menu">
-        <a href="{% url 'home' %}" class="nav-link">Home</a>
-        <a href="{% url 'calculator_list' %}" class="nav-link">Calculate</a>
-        <a href="{% url 'aboutus' %}" class="nav-link">About</a>
-        <a href="{% url 'contact:contact' %}" class="nav-link">Contact</a>
+        <a href="{% url 'home' %}" class="nav-link">ዋና ገፅ</a>
+        <a href="{% url 'calculator_list' %}" class="nav-link">ስሌቶች</a>
+        <a href="{% url 'aboutus' %}" class="nav-link">ስለ እኛ</a>
+        <a href="{% url 'contact:contact' %}" class="nav-link">እኛን ለማግኘት</a>
         <div class="nav-auth-mobile">
             {% if user.is_authenticated %}
                 <span class="nav-user">ሰላም, {{ user.username }}</span>
@@ -72,7 +72,7 @@
         <div class="container footer-grid">
             <div class="footer-brand">
                 <a href="{% url 'home' %}" class="logo">ስነ-ከዋክብት</a>
-                <p>ጥንታዊ ኢትዮጵያዊ ስነ-ከዋክብት — የሊቃውንትና ጠበብት ምርምር ውጤት በዘመናዊ ቴክኖሎጂ።</p>
+                <p>የጥንታዊ ኢትዮጵያዊያን ስነ-ከዋክብት — የሊቃውንትና ጠበብት ምርምር ውጤት በዘመናዊ ቴክኖሎጂ።</p>
             </div>
             <div class="footer-links">
                 <h4>Navigate</h4>
